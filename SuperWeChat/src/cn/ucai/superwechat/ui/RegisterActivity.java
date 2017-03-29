@@ -77,6 +77,7 @@ public class RegisterActivity extends BaseActivity {
 					try {
 						// call method in SDK
 						EMClient.getInstance().createAccount(username, pwd);
+						//环信持有实例化
 						runOnUiThread(new Runnable() {
 							public void run() {
 								if (!RegisterActivity.this.isFinishing())
