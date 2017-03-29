@@ -15,8 +15,10 @@ package cn.ucai.superwechat.ui;
 
 import com.hyphenate.EMError;
 import com.hyphenate.chat.EMClient;
-import cn.ucai.superwechat.DemoHelper;
+
 import cn.ucai.superwechat.R;
+import cn.ucai.superwechat.SuperWeChatDemoHelper;
+
 import com.hyphenate.exceptions.HyphenateException;
 
 import android.app.ProgressDialog;
@@ -80,7 +82,7 @@ public class RegisterActivity extends BaseActivity {
 								if (!RegisterActivity.this.isFinishing())
 									pd.dismiss();
 								// save current user
-								DemoHelper.getInstance().setCurrentUserName(username);
+								SuperWeChatDemoHelper.getInstance().setCurrentUserName(username);
 								Toast.makeText(getApplicationContext(), getResources().getString(R.string.Registered_successfully), Toast.LENGTH_SHORT).show();
 								finish();
 							}

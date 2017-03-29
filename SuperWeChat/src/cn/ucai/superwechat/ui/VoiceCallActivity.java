@@ -35,8 +35,10 @@ import android.widget.Toast;
 
 import com.hyphenate.chat.EMCallStateChangeListener;
 import com.hyphenate.chat.EMClient;
-import cn.ucai.superwechat.DemoHelper;
+
 import cn.ucai.superwechat.R;
+import cn.ucai.superwechat.SuperWeChatDemoHelper;
+
 import com.hyphenate.exceptions.HyphenateException;
 import com.hyphenate.util.EMLog;
 
@@ -74,7 +76,7 @@ public class VoiceCallActivity extends CallActivity implements OnClickListener {
         }
 		setContentView(R.layout.em_activity_voice_call);
 		
-		DemoHelper.getInstance().isVoiceCalling = true;
+		cn.ucai.superwechat.SuperWeChatDemoHelper.getInstance().isVoiceCalling = true;
 		callType = 0;
 
         comingBtnContainer = (LinearLayout) findViewById(R.id.ll_coming_call);
@@ -395,7 +397,7 @@ public class VoiceCallActivity extends CallActivity implements OnClickListener {
 	
     @Override
     protected void onDestroy() {
-        DemoHelper.getInstance().isVoiceCalling = false;
+        SuperWeChatDemoHelper.getInstance().isVoiceCalling = false;
         stopMonitor();
         super.onDestroy();
     }

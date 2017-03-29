@@ -17,7 +17,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import cn.ucai.superwechat.DemoHelper;
+import cn.ucai.superwechat.SuperWeChatDemoHelper;
 
 public class DbOpenHelper extends SQLiteOpenHelper{
 
@@ -66,7 +66,7 @@ public class DbOpenHelper extends SQLiteOpenHelper{
 	}
 	
 	private static String getUserDatabaseName() {
-        return  DemoHelper.getInstance().getCurrentUsernName() + "_demo.db";
+        return  SuperWeChatDemoHelper.getInstance().getCurrentUsernName() + "_demo.db";
     }
 	
 	@Override
