@@ -7,6 +7,7 @@ import com.hyphenate.chat.EMClient;
 
 import cn.ucai.superwechat.R;
 import cn.ucai.superwechat.SuperWeChatDemoHelper;
+import cn.ucai.superwechat.utils.MFGT;
 
 import com.hyphenate.util.EasyUtils;
 
@@ -51,7 +52,8 @@ public class SplashActivity extends BaseActivity {
 						// avoid main screen overlap Calling Activity
 					} else {
 						//enter main screen
-						startActivity(new Intent(SplashActivity.this, MainActivity.class));
+						MFGT.gotoMain(SplashActivity.this);
+						//   startActivity(new Intent(SplashActivity.this, MainActivity.class));
 					}
 					finish();
 				}else {
@@ -59,7 +61,8 @@ public class SplashActivity extends BaseActivity {
 						Thread.sleep(sleepTime);
 					} catch (InterruptedException e) {
 					}
-					startActivity(new Intent(SplashActivity.this, LoginActivity.class));
+					MFGT.gotoGuide(SplashActivity.this);
+					//startActivity(new Intent(SplashActivity.this, LoginActivity.class));
 					finish();
 				}
 			}
