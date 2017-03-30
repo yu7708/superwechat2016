@@ -50,6 +50,7 @@ import com.hyphenate.easeui.controller.EaseUI.EaseUserProfileProvider;
 import com.hyphenate.easeui.domain.EaseEmojicon;
 import com.hyphenate.easeui.domain.EaseEmojiconGroupEntity;
 import com.hyphenate.easeui.domain.EaseUser;
+import com.hyphenate.easeui.domain.User;
 import com.hyphenate.easeui.model.EaseAtMessageHelper;
 import com.hyphenate.easeui.model.EaseNotifier;
 import com.hyphenate.easeui.model.EaseNotifier.EaseNotificationInfoProvider;
@@ -86,6 +87,8 @@ public class SuperWeChatDemoHelper {
     protected EMMessageListener messageListener = null;
 
 	private Map<String, EaseUser> contactList;
+
+    private Map<String, com.hyphenate.easeui.domain.User> appContactList;
 
 	private Map<String, RobotUser> robotList;
 
@@ -1352,4 +1355,61 @@ public class SuperWeChatDemoHelper {
         easeUI.popActivity(activity);
     }
 
+    //// FIXME: 2017/3/30
+    /**
+     * update contact list
+     *
+     * @param aContactList
+     */
+    public void setAppContactList(Map<String, com.hyphenate.easeui.domain.User> aContactList) {
+        if(aContactList == null){
+            if (appContactList != null) {
+                appContactList.clear();
+            }
+            return;
+        }
+
+        appContactList = aContactList;
+    }
+
+    /**
+     * save single contact
+     */
+    public void saveAppContact(User user){
+        //这样会报空指针
+        //appContactList.put(user.getMUserName(), user);
+        getAppContactList().put(user.getMUserName(),user);
+        demoModel.saveAppContact(user);
+    }
+
+    /**
+     * get contact list
+     *
+     * @return
+     */
+    public Map<String, User> getAppContactList() {
+        if (isLoggedIn() && appContactList == null) {
+            appContactList = demoModel.getAppContactList();
+        }
+
+        // return a empty non-null object to avoid app crash
+        if(appContactList == null){
+            return new Hashtable<String, User>();
+        }
+
+        return appContactList;
+    }
+    /**
+     * update user list to cache and database
+     *
+     * @param contactInfoList
+     */
+    public void updateAppContactList(List<User> contactInfoList) {
+        for (User u : contactInfoList) {
+            appContactList.put(u.getMUserName(), u);
+        }
+        ArrayList<User> mList = new ArrayList<User>();
+        mList.addAll(appContactList.values());
+        demoModel.saveAppContactList(mList);
+    }
 }

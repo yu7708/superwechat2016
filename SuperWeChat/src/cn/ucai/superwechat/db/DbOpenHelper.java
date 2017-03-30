@@ -18,9 +18,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import cn.ucai.superwechat.SuperWeChatDemoHelper;
+import cn.ucai.superwechat.utils.L;
 
 public class DbOpenHelper extends SQLiteOpenHelper{
-
+	private static final String TAG = "DbOpenHelper";
 	private static final int DATABASE_VERSION = 6;
 	private static DbOpenHelper instance;
 
@@ -53,7 +54,17 @@ public class DbOpenHelper extends SQLiteOpenHelper{
             + UserDao.PREF_TABLE_NAME + " ("
             + UserDao.COLUMN_NAME_DISABLED_GROUPS + " TEXT, "
             + UserDao.COLUMN_NAME_DISABLED_IDS + " TEXT);";
-	
+	//// FIXME: 2017/3/30
+	private static final String CREATE_USER_TABLE=
+			"CREATE TABLE " + UserDao.USER_TABLE_NAME + "("
+					+ UserDao.USER_COLUMN_NAME + " TEXT PRIMARY KEY,"
+					+ UserDao.USER_COLUMN_NICK + " TEXT,"
+					+ UserDao.USER_COLUMN_AVATAR + " INTEGER,"
+					+ UserDao.USER_COLUMN_AVATAR_PATH + " TEXT,"
+					+ UserDao.USER_COLUMN_AVATAR_SUFFIX + " INTEGER,"
+					+ UserDao.USER_COLUMN_AVATAR_TYPE + " IN,"
+					+ UserDao.USER_COLUMN_AVATAR_UPDATE_TIME + " TEXT);";
+	//--f
 	private DbOpenHelper(Context context) {
 		super(context, getUserDatabaseName(), null, DATABASE_VERSION);
 	}
@@ -75,7 +86,8 @@ public class DbOpenHelper extends SQLiteOpenHelper{
 		db.execSQL(INIVTE_MESSAGE_TABLE_CREATE);
 		db.execSQL(CREATE_PREF_TABLE);
 		db.execSQL(ROBOT_TABLE_CREATE);
-		
+		db.execSQL(CREATE_USER_TABLE);
+		L.e(TAG,"onCreate" + CREATE_USER_TABLE);
 	}
 
 	@Override

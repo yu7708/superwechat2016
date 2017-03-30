@@ -1,5 +1,7 @@
 package cn.ucai.superwechat.domain;
 
+import com.hyphenate.easeui.domain.User;
+
 import java.io.Serializable;
 
 public class Member extends User implements Serializable {

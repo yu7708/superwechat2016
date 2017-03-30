@@ -192,7 +192,7 @@ public class LoginActivity extends BaseActivity {
                 }
                 // get user's info (this should be get from App's server or 3rd party service)
                 //获取数据，要自己提交到第三方数据端
-                SuperWeChatDemoHelper.getInstance().getUserProfileManager().asyncGetCurrentUserInfo();
+          //      SuperWeChatDemoHelper.getInstance().getUserProfileManager().asyncGetCurrentUserInfo();
                 //拿到自己定义的
                 SuperWeChatDemoHelper.getInstance().getUserProfileManager().asyncGetCurrentAppUserInfo();
 
