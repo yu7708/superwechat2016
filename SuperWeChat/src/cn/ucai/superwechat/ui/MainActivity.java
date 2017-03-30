@@ -88,51 +88,23 @@ public class MainActivity extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-		    String packageName = getPackageName();
-		    PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-		    if (!pm.isIgnoringBatteryOptimizations(packageName)) {
-		        Intent intent = new Intent();
-		        intent.setAction(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-		        intent.setData(Uri.parse("package:" + packageName));
-		        startActivity(intent);
-		    }
-		}
-		
-		//make sure activity will not in background if user is logged into another device or removed
-		if (savedInstanceState != null && savedInstanceState.getBoolean(Constant.ACCOUNT_REMOVED, false)) {
-		    cn.ucai.superwechat.SuperWeChatDemoHelper.getInstance().logout(false,null);
-			finish();
-			startActivity(new Intent(this, LoginActivity.class));
-			return;
-		} else if (savedInstanceState != null && savedInstanceState.getBoolean("isConflict", false)) {
-			finish();
-			startActivity(new Intent(this, LoginActivity.class));
-			return;
-		}
+		savePower();//省电
+		checkAccount(savedInstanceState);//检查账号
+
 		setContentView(R.layout.em_activity_main);
 		// runtime permission for android 6.0, just require all permissions here for simple
 		requestPermissions();
 
 		initView();
+		umengInit();//友盟
 
-		//umeng api
-		MobclickAgent.updateOnlineConfig(this);
-		UmengUpdateAgent.setUpdateOnlyWifi(false);
-		UmengUpdateAgent.update(this);
 
 		showExceptionDialogFromIntent(getIntent());
 
 		inviteMessgeDao = new InviteMessgeDao(this);
 		UserDao userDao = new UserDao(this);
-		conversationListFragment = new ConversationListFragment();
-		contactListFragment = new ContactListFragment();
-		SettingsFragment settingFragment = new SettingsFragment();
-		fragments = new Fragment[] { conversationListFragment, contactListFragment, settingFragment};
+		initFragment();//初始化
 
-		getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, conversationListFragment)
-				.add(R.id.fragment_container, contactListFragment).hide(contactListFragment).show(conversationListFragment)
-				.commit();
 
 		//register broadcast receiver to receive the change of group from SuperWeChatDemoHelper
 		registerBroadcastReceiver();
@@ -141,6 +113,51 @@ public class MainActivity extends BaseActivity {
 		EMClient.getInstance().contactManager().setContactListener(new MyContactListener());
 		//debug purpose only
         registerInternalDebugReceiver();
+	}
+
+	private void initFragment() {
+		conversationListFragment = new ConversationListFragment();
+		contactListFragment = new ContactListFragment();
+		SettingsFragment settingFragment = new SettingsFragment();
+		fragments = new Fragment[] { conversationListFragment, contactListFragment, settingFragment};
+
+		getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, conversationListFragment)
+				.add(R.id.fragment_container, contactListFragment).hide(contactListFragment).show(conversationListFragment)
+				.commit();
+	}
+
+	private void umengInit() {
+		//umeng api
+		MobclickAgent.updateOnlineConfig(this);
+		UmengUpdateAgent.setUpdateOnlyWifi(false);
+		UmengUpdateAgent.update(this);
+	}
+
+	private void checkAccount(Bundle savedInstanceState) {
+		//make sure activity will not in background if user is logged into another device or removed
+		if (savedInstanceState != null && savedInstanceState.getBoolean(Constant.ACCOUNT_REMOVED, false)) {
+			cn.ucai.superwechat.SuperWeChatDemoHelper.getInstance().logout(false,null);
+			finish();
+			startActivity(new Intent(this, LoginActivity.class));
+			return;
+		} else if (savedInstanceState != null && savedInstanceState.getBoolean("isConflict", false)) {
+			finish();
+			startActivity(new Intent(this, LoginActivity.class));
+			return;
+		}
+	}
+
+	private void savePower() {
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			String packageName = getPackageName();
+			PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+			if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+				Intent intent = new Intent();
+				intent.setAction(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+				intent.setData(Uri.parse("package:" + packageName));
+				startActivity(intent);
+			}
+		}
 	}
 
 	@TargetApi(23)
