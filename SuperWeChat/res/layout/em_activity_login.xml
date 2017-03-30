@@ -5,18 +5,7 @@
     android:background="#eff2f6"
     android:orientation="vertical" >
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1" >
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerInParent="true"
-            android:src="@drawable/em_welcom_logo" />
-    </RelativeLayout>
+    <include android:id="@+id/lr_title" layout="@layout/view_layout_title"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -96,6 +85,7 @@
             android:orientation="horizontal" >
 
             <Button
+                android:id="@+id/bt_register"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dip"
@@ -111,6 +101,7 @@
                 android:textSize="18sp" />
 
             <Button
+                android:id="@+id/bt_login"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dip"
