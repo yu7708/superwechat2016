@@ -94,6 +94,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
     }
     @OnClick(R.id.tv_profile_settings)
     public void setting(){
+
         MFGT.gotoSetting(getActivity());
     }
     //// FIXME: 2017/3/31 改后的setting里拿出的

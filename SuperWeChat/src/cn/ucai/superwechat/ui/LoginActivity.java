@@ -42,6 +42,7 @@ import cn.ucai.superwechat.SuperWeChatApplication;
 import cn.ucai.superwechat.SuperWeChatDemoHelper;
 import cn.ucai.superwechat.db.SuperWeChatDBManager;
 import cn.ucai.superwechat.utils.MD5;
+import cn.ucai.superwechat.utils.MFGT;
 
 /**
  * Login screen
@@ -49,14 +50,16 @@ import cn.ucai.superwechat.utils.MD5;
 public class LoginActivity extends BaseActivity {
     private static final String TAG = "LoginActivity";
     public static final int REQUEST_CODE_SETNICK = 1;
-    @BindView(R.id.img_back)
-    ImageView imgBack;
+    int keyCode=0;
+    KeyEvent event=null;
     @BindView(R.id.txt_title)
     TextView txt_title;
     @BindView(R.id.username)
     EditText usernameEditText;
     @BindView(R.id.password)
     EditText passwordEditText;
+    @BindView(R.id.img_back)
+    ImageView imgBack;
 
 
     private boolean progressShow;
@@ -123,7 +126,7 @@ public class LoginActivity extends BaseActivity {
 
     /**
      * login
-    */
+     */
     public void login() {
         if (!EaseCommonUtils.isNetWorkConnected(this)) {
             Toast.makeText(this, R.string.network_isnot_available, Toast.LENGTH_SHORT).show();
@@ -192,7 +195,7 @@ public class LoginActivity extends BaseActivity {
                 }
                 // get user's info (this should be get from App's server or 3rd party service)
                 //获取数据，要自己提交到第三方数据端
-          //      SuperWeChatDemoHelper.getInstance().getUserProfileManager().asyncGetCurrentUserInfo();
+                //      SuperWeChatDemoHelper.getInstance().getUserProfileManager().asyncGetCurrentUserInfo();
                 //拿到自己定义的
                 SuperWeChatDemoHelper.getInstance().getUserProfileManager().asyncGetCurrentAppUserInfo();
 
@@ -251,5 +254,32 @@ public class LoginActivity extends BaseActivity {
                 login();
                 break;
         }
+    }
+
+
+    /**
+     * 设置返回键不关闭应用,回到桌面
+     *
+     * @param keyCode
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
+            //启动一个意图,回到桌面
+            Intent backHome = new Intent(Intent.ACTION_MAIN);
+            backHome.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            backHome.addCategory(Intent.CATEGORY_HOME);
+            startActivity(backHome);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+
+    @OnClick(R.id.img_back)
+    public void onClick() {
+        MFGT.gotoGuide(LoginActivity.this);
     }
 }

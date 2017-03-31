@@ -18,14 +18,12 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -38,6 +36,7 @@ import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMOptions;
 import com.hyphenate.easeui.widget.EaseSwitchButton;
+import com.hyphenate.easeui.widget.EaseTitleBar;
 import com.hyphenate.util.EMLog;
 
 import java.io.File;
@@ -45,16 +44,15 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import cn.ucai.superwechat.Constant;
+import butterknife.OnClick;
 import cn.ucai.superwechat.R;
 import cn.ucai.superwechat.SuperWeChatDemoHelper;
 import cn.ucai.superwechat.SuperWeChatModel;
+import cn.ucai.superwechat.utils.MFGT;
 import cn.ucai.superwechat.utils.PreferenceManager;
 
 /**
  * settings screen
- *
- *
  */
 @SuppressWarnings({"FieldCanBeLocal"})
 public class SettingsActivity extends BaseActivity implements OnClickListener {
@@ -125,6 +123,8 @@ public class SettingsActivity extends BaseActivity implements OnClickListener {
     RelativeLayout rlSwitchAdaptiveVideoEncode;
     @BindView(R.id.btn_logout)
     Button btnLogout;
+    @BindView(R.id.etb_title)
+    EaseTitleBar etbTitle;
     /**
      * new message notification
      */
@@ -190,6 +190,7 @@ public class SettingsActivity extends BaseActivity implements OnClickListener {
     private SuperWeChatModel settingsModel;
     private EMOptions chatOptions;
     private EditText edit_custom_appkey;
+
     //// FIXME: 2017/3/31 将fragment改为了Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -206,7 +207,7 @@ public class SettingsActivity extends BaseActivity implements OnClickListener {
         rl_switch_delete_msg_when_exit_group = (RelativeLayout) findViewById(R.id.rl_switch_delete_msg_when_exit_group);
         rl_switch_auto_accept_group_invitation = (RelativeLayout) findViewById(R.id.rl_switch_auto_accept_group_invitation);
         rl_switch_adaptive_video_encode = (RelativeLayout) findViewById(R.id.rl_switch_adaptive_video_encode);
-        rl_custom_appkey = (RelativeLayout)findViewById(R.id.rl_custom_appkey);
+        rl_custom_appkey = (RelativeLayout) findViewById(R.id.rl_custom_appkey);
         rl_custom_server = (RelativeLayout) findViewById(R.id.rl_custom_server);
         rl_push_settings = (RelativeLayout) findViewById(R.id.rl_push_settings);
 
@@ -241,6 +242,19 @@ public class SettingsActivity extends BaseActivity implements OnClickListener {
 
         settingsModel = SuperWeChatDemoHelper.getInstance().getModel();
         chatOptions = EMClient.getInstance().getOptions();
+        //// FIXME: 2017/3/31 标题栏的返回
+        if (getTitle() != null) {
+            etbTitle.setLeftLayoutClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(SettingsActivity.this,"返回成功",Toast.LENGTH_SHORT).show();
+                    MFGT.finish(SettingsActivity.this);
+                }
+            });
+        }else{
+            Toast.makeText(SettingsActivity.this,"返回失败",Toast.LENGTH_SHORT).show();
+        }
+
 
         blacklistContainer.setOnClickListener(this);
         userProfileContainer.setOnClickListener(this);
@@ -502,6 +516,7 @@ public class SettingsActivity extends BaseActivity implements OnClickListener {
         //// FIXME: 2017/3/31  隐藏设置一进去就会出现虚拟键盘的问题,这个是从本类继承的父类的方法
         hideSoftKeyboard();
     }
+
     //退出
     void logout() {
         final ProgressDialog pd = new ProgressDialog(this);
@@ -546,8 +561,6 @@ public class SettingsActivity extends BaseActivity implements OnClickListener {
     }
 
 
-
-
     void sendLogThroughMail() {
         String logPath = "";
         try {
@@ -587,7 +600,7 @@ public class SettingsActivity extends BaseActivity implements OnClickListener {
                 startActivity(intent);
             } catch (final Exception e) {
                 e.printStackTrace();
-               runOnUiThread(new Runnable() {
+                runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         Toast.makeText(SettingsActivity.this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
@@ -595,5 +608,10 @@ public class SettingsActivity extends BaseActivity implements OnClickListener {
                 });
             }
         }
+    }
+
+    @OnClick(R.id.etb_back)
+    public void onClick() {
+        MFGT.finish(SettingsActivity.this);
     }
 }

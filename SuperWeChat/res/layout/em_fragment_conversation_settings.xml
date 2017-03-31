@@ -4,13 +4,24 @@
     android:layout_height="match_parent"
     android:background="@color/common_bg"
     android:orientation="vertical" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
     <com.hyphenate.easeui.widget.EaseTitleBar
-        android:layout_width="match_parent"
+        android:id="@+id/etb_title"
+        android:layout_width="350dp"
         android:layout_height="wrap_content"
         app:titleBarTitle="@string/set"
         />
-
+        <ImageView
+            android:id="@+id/etb_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/etb_title"
+            android:src="@drawable/ease_mm_title_back"/>
+    </RelativeLayout>
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
