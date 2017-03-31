@@ -30,6 +30,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -63,6 +64,7 @@ import cn.ucai.superwechat.db.InviteMessgeDao;
 import cn.ucai.superwechat.db.UserDao;
 import cn.ucai.superwechat.runtimepermissions.PermissionsManager;
 import cn.ucai.superwechat.runtimepermissions.PermissionsResultAction;
+import cn.ucai.superwechat.ui.fragment.ProfileFragment;
 import cn.ucai.superwechat.widget.DMTabHost;
 import cn.ucai.superwechat.widget.MFViewPager;
 
@@ -135,6 +137,10 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
         conversationListFragment = new ConversationListFragment();
         contactListFragment = new ContactListFragment();
         SettingsFragment settingFragment = new SettingsFragment();
+        //// FIXME: 2017/3/31
+        //替换上面的settingFragment，把个人中心界面改改
+        ProfileFragment profileFragment =new ProfileFragment();
+        //--f
         fragments = new Fragment[]{conversationListFragment, contactListFragment, settingFragment};
 
 		/*getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, conversationListFragment)
@@ -144,10 +150,14 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
         mAdapter.addFragment(conversationListFragment,getString(R.string.app_name));
         mAdapter.addFragment(contactListFragment,getString(R.string.contacts));
         mAdapter.addFragment(new DicoverFragment(),getString(R.string.discover));
-        mAdapter.addFragment(settingFragment,getString(R.string.me));
+       // mAdapter.addFragment(settingFragment,getString(R.string.me));
+        //// FIXME: 2017/3/31　　//替换布局
+        mAdapter.addFragment(profileFragment,getString(R.string.me));
+        //--f
         layoutViewpage.setAdapter(mAdapter);
         layoutViewpage.setOnPageChangeListener(this);
         layoutTabhost.setOnCheckedChangeListener(this);
+        layoutTabhost.setChecked(0);
     }
 
     private void umengInit() {
@@ -344,22 +354,28 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        Log.e(TAG,"onPageScrolled,position="+position+",positionOffset="+positionOffset+",positionOffsetPixels="+positionOffsetPixels);
 
     }
 
     @Override
     public void onPageSelected(int position) {
-
+        Log.e(TAG,"onPageSelected,position="+position);
+        //// FIXME: 2017/3/31 
+        layoutTabhost.setChecked(position);//这边设置按钮显示哪个
     }
 
     @Override
     public void onPageScrollStateChanged(int state) {
-
+        Log.e(TAG,"onPageScrollStateChanged,state:"+state);
     }
 
     @Override
     public void onCheckedChange(int checkedPosition, boolean byUser) {
-
+        Log.e(TAG,"onCheckedChange,checkedPosition:"+checkedPosition+",byUser="+byUser);
+        //这边显示按钮同步的滑动,两边调用另一方
+        //// FIXME: 2017/3/31
+        layoutViewpage.setCurrentItem(checkedPosition,false);
     }
 
     public class MyContactListener implements EMContactListener {

@@ -271,11 +271,17 @@ public class SuperWeChatDemoHelper {
 
     protected void setEaseUIProviders() {
     	// set profile provider if you want easeUI to handle avatar and nickname
+        //如果你想easeui处理头像和昵称设置配置文件提供程序
         easeUI.setUserProfileProvider(new EaseUserProfileProvider() {
             
             @Override
             public EaseUser getUser(String username) {
                 return getUserInfo(username);
+            }
+
+            @Override
+            public User getAppUser(String username) {
+                return getAppUserInfo(username);
             }
         });
 
@@ -814,6 +820,8 @@ public class SuperWeChatDemoHelper {
 	private EaseUser getUserInfo(String username){
 		// To get instance of EaseUser, here we get it from the user list in memory
 		// You'd better cache it if you get it from your server
+        //得到easeuser实例，这里我们把它从内存中的用户列表
+        //你最好缓存它，如果你从你的服务器
         EaseUser user = null;
         if(username.equals(EMClient.getInstance().getCurrentUser()))
             return getUserProfileManager().getCurrentUserInfo();
@@ -829,7 +837,24 @@ public class SuperWeChatDemoHelper {
         }
         return user;
 	}
-	
+    //// FIXME: 2017/3/31 //设置个人界面的图像和昵称
+    private User getAppUserInfo(String username){
+        // To get instance of EaseUser, here we get it from the user list in memory
+        // You'd better cache it if you get it from your server
+        //得到easeuser实例，这里我们把它从内存中的用户列表
+        //你最好缓存它，如果你从你的服务器
+        User user = null;
+        if(username.equals(EMClient.getInstance().getCurrentUser()))
+            return getUserProfileManager().getCurrentAppUserInfo();
+        user = getAppContactList().get(username);
+        // if user is not in your contacts, set inital letter for him/
+        //如果用户不在您的联系人，设置初始的信给他/她
+        if(user == null){
+            user = new User(username);
+            EaseCommonUtils.setAppUserInitialLetter(user);
+        }
+        return user;
+    }
 	 /**
      * Global listener
      * If this event already handled by an activity, you don't need handle it again
