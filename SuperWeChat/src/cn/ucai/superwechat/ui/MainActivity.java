@@ -136,12 +136,12 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
 
         conversationListFragment = new ConversationListFragment();
         contactListFragment = new ContactListFragment();
-        SettingsFragment settingFragment = new SettingsFragment();
+        //SettingsFragment settingFragment = new SettingsFragment();
         //// FIXME: 2017/3/31
         //替换上面的settingFragment，把个人中心界面改改
         ProfileFragment profileFragment =new ProfileFragment();
         //--f
-        fragments = new Fragment[]{conversationListFragment, contactListFragment, settingFragment};
+        fragments = new Fragment[]{conversationListFragment, contactListFragment};
 
 		/*getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, conversationListFragment)
                 .add(R.id.fragment_container, contactListFragment).hide(contactListFragment).show(conversationListFragment)
@@ -221,6 +221,8 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
 		mTabs[2] = (Button) findViewById(R.id.btn_setting);
 		// select first tab
 		mTabs[0].setSelected(true);*/
+        //// FIXME: 2017/3/31 显示在每一个界面的主题
+        txtLeft.setVisibility(View.VISIBLE);
 	}
 
     /**

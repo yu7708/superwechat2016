@@ -17,8 +17,10 @@ package com.hyphenate.easeui.ui;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.net.http.LoggingEventHandler;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -27,7 +29,7 @@ import com.hyphenate.easeui.controller.EaseUI;
 
 @SuppressLint({"NewApi", "Registered"})
 public class EaseBaseActivity extends FragmentActivity {
-
+    private static final String TAG = "EaseBaseActivity";
     protected InputMethodManager inputMethodManager;
 
     @Override
@@ -56,10 +58,17 @@ public class EaseBaseActivity extends FragmentActivity {
     }
     
     protected void hideSoftKeyboard() {
+        Log.e(TAG, "hideSoftKeyboard: getWindow().getAttributes()="+getWindow().getAttributes() );
         if (getWindow().getAttributes().softInputMode != WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) {
-            if (getCurrentFocus() != null)
+            Log.e(TAG, "hideSoftKeyboard: getCurrentFocus"+getCurrentFocus() );
+            Log.e(TAG, "hideSoftKeyboard: inputMethodManager="+inputMethodManager);
+            if (getCurrentFocus() != null) {
                 inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
                         InputMethodManager.HIDE_NOT_ALWAYS);
+            }else{
+                //// FIXME: 2017/3/31 在没有可以编辑,没有焦点的情况下,直接就隐藏虚拟键盘
+                getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+            }
         }
     }
 
