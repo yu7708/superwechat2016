@@ -2,6 +2,8 @@ package cn.ucai.superwechat.db;
 
 import android.content.Context;
 
+import java.io.File;
+
 import cn.ucai.superwechat.I;
 import cn.ucai.superwechat.utils.OkHttpUtils;
 
@@ -42,7 +44,29 @@ public class UserModel implements IUserModel{
     }
 
     @Override
-    public void loadUserInfo(Context context, String username, OkHttpUtils.OnCompleteListener<String> listener) {
+    public void updateUserNick(Context context, String username, String nickname, OnCompleteListener<String> listener) {
+        OkHttpUtils<String> utils=new OkHttpUtils<>(context);
+        utils.setRequestUrl(I.REQUEST_UPDATE_USER_NICK)
+                .addParam(I.User.USER_NAME,username)
+                .addParam(I.User.NICK,nickname)
+                .targetClass(String.class)
+                .execute(listener);
+    }
+
+    @Override
+    public void updateAvatar(Context context, String username,File file, OnCompleteListener<String> listener) {
+        OkHttpUtils<String> utils=new OkHttpUtils<>(context);
+        utils.setRequestUrl(I.REQUEST_UPDATE_AVATAR)
+                .addParam(I.NAME_OR_HXID,username)
+                .addParam(I.AVATAR_TYPE,I.AVATAR_TYPE_USER_PATH)
+                .addFile2(file)
+                .targetClass(String.class)
+                .post()
+                .execute(listener);
+    }
+
+    @Override
+    public void loadUserInfo(Context context, String username, OnCompleteListener<String> listener) {
         OkHttpUtils<String> utils=new OkHttpUtils<>(context);
         utils.setRequestUrl(I.REQUEST_FIND_USER)
                 .addParam(I.User.USER_NAME,username)

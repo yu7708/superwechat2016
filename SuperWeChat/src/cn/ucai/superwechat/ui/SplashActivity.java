@@ -2,6 +2,8 @@ package cn.ucai.superwechat.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 
 import com.hyphenate.chat.EMClient;
 
@@ -18,7 +20,7 @@ import com.hyphenate.util.EasyUtils;
 public class SplashActivity extends BaseActivity {
 
 	private static final int sleepTime = 2000;
-
+	Handler handler=new Handler();
 	@Override
 	protected void onCreate(Bundle arg0) {
 		setContentView(R.layout.em_activity_splash);
@@ -29,7 +31,6 @@ public class SplashActivity extends BaseActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-
 		new Thread(new Runnable() {
 			public void run() {
 				if (SuperWeChatDemoHelper.getInstance().isLoggedIn()) {

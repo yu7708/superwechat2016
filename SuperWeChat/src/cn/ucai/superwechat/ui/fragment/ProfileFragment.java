@@ -77,6 +77,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
     public void onClick(View v) {
     switch (v.getId()){
         case R.id.tv_profile_money:
+            Log.e("main","sssss");
             RedPacketUtil.startChangeActivity(getContext());
             break;
         case R.id.layout_profile_view:
@@ -108,4 +109,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
         }
     }
     //---f
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //每次重新开启的时候可以得到数据
+        initData();
+    }
 }
