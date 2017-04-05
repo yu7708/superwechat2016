@@ -33,6 +33,7 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,6 +50,7 @@ import com.hyphenate.chat.EMConversation.EMConversationType;
 import com.hyphenate.chat.EMMessage;
 import com.hyphenate.easeui.utils.EaseCommonUtils;
 import com.hyphenate.util.EMLog;
+import com.hyphenate.util.NetUtils;
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.update.UmengUpdateAgent;
 
@@ -67,9 +69,11 @@ import cn.ucai.superwechat.runtimepermissions.PermissionsResultAction;
 import cn.ucai.superwechat.ui.fragment.ProfileFragment;
 import cn.ucai.superwechat.widget.DMTabHost;
 import cn.ucai.superwechat.widget.MFViewPager;
+import cn.ucai.superwechat.widget.TitleMenu.ActionItem;
+import cn.ucai.superwechat.widget.TitleMenu.TitlePopup;
 
 @SuppressLint("NewApi")
-public class MainActivity extends BaseActivity implements ViewPager.OnPageChangeListener,DMTabHost.OnCheckedChangeListener{
+public class MainActivity extends BaseActivity implements ViewPager.OnPageChangeListener, DMTabHost.OnCheckedChangeListener {
 
     protected static final String TAG = "MainActivity";
     @BindView(R.id.txt_left)
@@ -78,8 +82,10 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
     MFViewPager layoutViewpage;
     @BindView(R.id.layout_tabhost)
     DMTabHost layoutTabhost;
+    @BindView(R.id.txt_right)
+    TextView txtRight;
     // textview for unread message count
-   // private TextView unreadLabel;
+    // private TextView unreadLabel;
     // textview for unread event message
     //private TextView unreadAddressLable;
 
@@ -94,6 +100,7 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
     private boolean isCurrentAccountRemoved = false;
 
     MainTabAdapter mAdapter;
+    TitlePopup mPopup;
     /**
      * check if current user account was remove
      */
@@ -139,20 +146,20 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
         //SettingsFragment settingFragment = new SettingsFragment();
         //// FIXME: 2017/3/31
         //替换上面的settingFragment，把个人中心界面改改
-        ProfileFragment profileFragment =new ProfileFragment();
+        ProfileFragment profileFragment = new ProfileFragment();
         //--f
         fragments = new Fragment[]{conversationListFragment, contactListFragment};
 
 		/*getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, conversationListFragment)
                 .add(R.id.fragment_container, contactListFragment).hide(contactListFragment).show(conversationListFragment)
 				.commit();*/
-        mAdapter=new MainTabAdapter(getSupportFragmentManager());
-        mAdapter.addFragment(conversationListFragment,getString(R.string.app_name));
-        mAdapter.addFragment(contactListFragment,getString(R.string.contacts));
-        mAdapter.addFragment(new DicoverFragment(),getString(R.string.discover));
-       // mAdapter.addFragment(settingFragment,getString(R.string.me));
+        mAdapter = new MainTabAdapter(getSupportFragmentManager());
+        mAdapter.addFragment(conversationListFragment, getString(R.string.app_name));
+        mAdapter.addFragment(contactListFragment, getString(R.string.contacts));
+        mAdapter.addFragment(new DicoverFragment(), getString(R.string.discover));
+        // mAdapter.addFragment(settingFragment,getString(R.string.me));
         //// FIXME: 2017/3/31　　//替换布局
-        mAdapter.addFragment(profileFragment,getString(R.string.me));
+        mAdapter.addFragment(profileFragment, getString(R.string.me));
         //--f
         layoutViewpage.setAdapter(mAdapter);
         layoutViewpage.setOnPageChangeListener(this);
@@ -212,8 +219,8 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
     /**
      * init views
      */
-	private void initView() {
-		/*unreadLabel = (TextView) findViewById(R.id.unread_msg_number);
+    private void initView() {
+        /*unreadLabel = (TextView) findViewById(R.id.unread_msg_number);
 		unreadAddressLable = (TextView) findViewById(R.id.unread_address_number);
 		mTabs = new Button[3];
 		mTabs[0] = (Button) findViewById(R.id.btn_conversation);
@@ -223,7 +230,45 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
 		mTabs[0].setSelected(true);*/
         //// FIXME: 2017/3/31 显示在每一个界面的主题
         txtLeft.setVisibility(View.VISIBLE);
-	}
+        txtRight.setVisibility(View.VISIBLE);
+        mPopup=new TitlePopup(MainActivity.this, ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        mPopup.addAction(new ActionItem(MainActivity.this,R.string.menu_groupchat,R.drawable.icon_menu_group));
+        mPopup.addAction(new ActionItem(MainActivity.this,R.string.menu_addfriend,R.drawable.icon_menu_addfriend));
+        mPopup.addAction(new ActionItem(MainActivity.this,R.string.menu_qrcode,R.drawable.icon_menu_sao));
+        mPopup.addAction(new ActionItem(MainActivity.this,R.string.menu_money,R.drawable.icon_menu_money));
+        txtRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Toast.makeText(MainActivity.this, "aaa", Toast.LENGTH_SHORT).show();
+              if(NetUtils.hasDataConnection(MainActivity.this)){
+                mPopup.show(txtRight);}
+            }
+        });
+        mPopup.setItemOnClickListener(new TitlePopup.OnItemOnClickListener() {
+            @Override
+            public void onItemClick(ActionItem item, int position) {
+                switch (position){
+                    case 1:
+                        //显示好友
+                        startActivity(new Intent(MainActivity.this, AddContactActivity.class));
+                        break;
+                }
+            }
+        });
+    }/*txtRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //// FIXME: 2017/4/5 设置弹窗
+                mPopup=new TitlePopup(MainActivity.this, ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                mPopup.addAction(new ActionItem(MainActivity.this,R.string.menu_groupchat,R.drawable.icon_menu_group));
+                mPopup.addAction(new ActionItem(MainActivity.this,R.string.menu_addfriend,R.drawable.icon_menu_addfriend));
+                mPopup.addAction(new ActionItem(MainActivity.this,R.string.menu_qrcode,R.drawable.icon_menu_sao));
+                mPopup.addAction(new ActionItem(MainActivity.this,R.string.menu_money,R.drawable.icon_menu_money));
+            }
+        });
+        mPopup.show(txtRight);*/
 
     /**
      * on tab clicked
@@ -356,28 +401,28 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        Log.e(TAG,"onPageScrolled,position="+position+",positionOffset="+positionOffset+",positionOffsetPixels="+positionOffsetPixels);
+        Log.e(TAG, "onPageScrolled,position=" + position + ",positionOffset=" + positionOffset + ",positionOffsetPixels=" + positionOffsetPixels);
 
     }
 
     @Override
     public void onPageSelected(int position) {
-        Log.e(TAG,"onPageSelected,position="+position);
+        Log.e(TAG, "onPageSelected,position=" + position);
         //// FIXME: 2017/3/31 
         layoutTabhost.setChecked(position);//这边设置按钮显示哪个
     }
 
     @Override
     public void onPageScrollStateChanged(int state) {
-        Log.e(TAG,"onPageScrollStateChanged,state:"+state);
+        Log.e(TAG, "onPageScrollStateChanged,state:" + state);
     }
 
     @Override
     public void onCheckedChange(int checkedPosition, boolean byUser) {
-        Log.e(TAG,"onCheckedChange,checkedPosition:"+checkedPosition+",byUser="+byUser);
+        Log.e(TAG, "onCheckedChange,checkedPosition:" + checkedPosition + ",byUser=" + byUser);
         //这边显示按钮同步的滑动,两边调用另一方
         //// FIXME: 2017/3/31
-        layoutViewpage.setCurrentItem(checkedPosition,false);
+        layoutViewpage.setCurrentItem(checkedPosition, false);
     }
 
     public class MyContactListener implements EMContactListener {

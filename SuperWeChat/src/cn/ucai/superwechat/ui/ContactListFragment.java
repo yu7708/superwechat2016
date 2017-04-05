@@ -24,6 +24,9 @@ import cn.ucai.superwechat.R;
 import cn.ucai.superwechat.db.InviteMessgeDao;
 import cn.ucai.superwechat.db.UserDao;
 import cn.ucai.superwechat.widget.ContactItemView;
+import cn.ucai.superwechat.widget.TitleMenu.ActionItem;
+import cn.ucai.superwechat.widget.TitleMenu.TitlePopup;
+
 import com.hyphenate.easeui.domain.EaseUser;
 import com.hyphenate.easeui.ui.EaseContactListFragment;
 import com.hyphenate.util.EMLog;
@@ -38,6 +41,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
@@ -56,18 +60,19 @@ public class ContactListFragment extends EaseContactListFragment {
     private View loadingView;
     private ContactItemView applicationItem;
     private InviteMessgeDao inviteMessgeDao;
-
+TitlePopup mPopup;
     @SuppressLint("InflateParams")
     @Override
     protected void initView() {
         super.initView();
         @SuppressLint("InflateParams") View headerView = LayoutInflater.from(getActivity()).inflate(R.layout.em_contacts_header, null);
         HeaderItemClickListener clickListener = new HeaderItemClickListener();
+        //申请与通知
         applicationItem = (ContactItemView) headerView.findViewById(R.id.application_item);
         applicationItem.setOnClickListener(clickListener);
         headerView.findViewById(R.id.group_item).setOnClickListener(clickListener);
-        headerView.findViewById(R.id.chat_room_item).setOnClickListener(clickListener);
-        headerView.findViewById(R.id.robot_item).setOnClickListener(clickListener);
+       // headerView.findViewById(R.id.chat_room_item).setOnClickListener(clickListener);
+      //  headerView.findViewById(R.id.robot_item).setOnClickListener(clickListener);
         listView.addHeaderView(headerView);
         //add loading view
         loadingView = LayoutInflater.from(getActivity()).inflate(R.layout.em_layout_loading_data, null);
@@ -99,13 +104,23 @@ public class ContactListFragment extends EaseContactListFragment {
     @SuppressWarnings("unchecked")
     @Override
     protected void setUpView() {
+        //// FIXME: 2017/4/5 设置弹窗
+        mPopup=new TitlePopup(getContext(), ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        mPopup.addAction(new ActionItem(getContext(),R.string.menu_groupchat,R.drawable.icon_menu_group));
+        mPopup.addAction(new ActionItem(getContext(),R.string.menu_addfriend,R.drawable.icon_menu_addfriend));
+        mPopup.addAction(new ActionItem(getContext(),R.string.menu_qrcode,R.drawable.icon_menu_sao));
+        mPopup.addAction(new ActionItem(getContext(),R.string.menu_money,R.drawable.icon_menu_money));
+        //设置通讯录的显示和监听
         titleBar.setRightImageResource(R.drawable.em_add);
         titleBar.setRightLayoutClickListener(new OnClickListener() {
             
             @Override
             public void onClick(View v) {
 //                startActivity(new Intent(getActivity(), AddContactActivity.class));
+                //判断网络连接,这里我看不到源码,不知道具体内容
                 NetUtils.hasDataConnection(getActivity());
+                mPopup.show(titleBar);
             }
         });
         //设置联系人数据
@@ -129,14 +144,14 @@ public class ContactListFragment extends EaseContactListFragment {
         });
 
         
-        // 进入添加好友页
+     /*   // 进入添加好友页
         titleBar.getRightLayout().setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getActivity(), AddContactActivity.class));
-            }
-        });
+               startActivity(new Intent(getActivity(), AddContactActivity.class));
+                }
+        });*/
         
         
         contactSyncListener = new ContactSyncListener();
@@ -186,7 +201,7 @@ public class ContactListFragment extends EaseContactListFragment {
                 // 进入群聊列表页面
                 startActivity(new Intent(getActivity(), GroupsActivity.class));
                 break;
-            case R.id.chat_room_item:
+        /*    case R.id.chat_room_item:
                 //进入聊天室列表页面
                 startActivity(new Intent(getActivity(), PublicChatRoomsActivity.class));
                 break;
@@ -194,7 +209,7 @@ public class ContactListFragment extends EaseContactListFragment {
                 //进入Robot列表页面
                 startActivity(new Intent(getActivity(), RobotsActivity.class));
                 break;
-
+*/
             default:
                 break;
             }
@@ -235,7 +250,7 @@ public class ContactListFragment extends EaseContactListFragment {
 	/**
 	 * delete contact
 	 * 
-	 * @param toDeleteUser
+	 * @param tobeDeleteUser
 	 */
 	public void deleteContact(final EaseUser tobeDeleteUser) {
 		String st1 = getResources().getString(R.string.deleting);
