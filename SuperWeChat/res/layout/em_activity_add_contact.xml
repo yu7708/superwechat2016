@@ -10,7 +10,7 @@
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="@dimen/height_top_bar"
-        android:background="@color/top_bar_normal_bg"
+        android:background="@color/colorPrimary"
         android:gravity="center_vertical">
 
         <include layout="@layout/ease_commom_back_btn" />
@@ -90,6 +90,12 @@
             android:text="@string/button_add"
             android:textSize="14sp" />
     </RelativeLayout>
-
-
+    <TextView
+        android:id="@+id/search_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="该用户不存在"
+        android:gravity="center"
+        android:visibility="gone"
+        android:textSize="20sp"/>
 </LinearLayout>
