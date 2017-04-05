@@ -6,7 +6,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.hyphenate.easeui.domain.User;
 import com.hyphenate.easeui.utils.EaseUserUtils;
@@ -68,8 +67,8 @@ public class FriendProfileActivity extends BaseActivity {
 
     private void showUserInfo() {
         //拿到了上面来了
-        boolean isFriend=SuperWeChatDemoHelper.getInstance().getContactList().containsKey(user.getMUserName());
-        if(isFriend){
+        boolean isFriend = SuperWeChatDemoHelper.getInstance().getContactList().containsKey(user.getMUserName());
+        if (isFriend) {
             //这一句会使列表添加当前user
             SuperWeChatDemoHelper.getInstance().saveAppContact(user);
         }
@@ -88,13 +87,26 @@ public class FriendProfileActivity extends BaseActivity {
         addListFriends.setText("详细资料");
 
     }
-    private void showIsFriend(boolean isFriend){
-        btnAddContact.setVisibility(isFriend? View.GONE:View.VISIBLE);
-        btnSendMsg.setVisibility(isFriend?View.VISIBLE:View.GONE);
-        btnSendVideo.setVisibility(isFriend?View.VISIBLE:View.GONE);
+
+    private void showIsFriend(boolean isFriend) {
+        btnAddContact.setVisibility(isFriend ? View.GONE : View.VISIBLE);
+        btnSendMsg.setVisibility(isFriend ? View.VISIBLE : View.GONE);
+        btnSendVideo.setVisibility(isFriend ? View.VISIBLE : View.GONE);
     }
+
     @OnClick(R.id.iv_back)
     public void onClick() {
         MFGT.finish(FriendProfileActivity.this);
+    }
+
+    @OnClick(R.id.btn_add_contact)
+    public void onConfirm() {
+        boolean isConfirm=true;
+        if(isConfirm){
+            //发送验证消息
+            MFGT.gotoSendAddFriend(FriendProfileActivity.this,user.getMUserName());
+        }else{
+            //直接加好友
+        }
     }
 }

@@ -82,6 +82,10 @@
         <activity android:name="cn.ucai.superwechat.ui.activity.FriendProfileActivity"
             android:screenOrientation="portrait"
             android:theme="@style/horizontal_slide"/>
+        <!--添加好友验证-->
+        <activity android:name="cn.ucai.superwechat.ui.activity.SendAddFriendActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/horizontal_slide"/>
         <!-- 登陆 -->
         <activity
             android:name="cn.ucai.superwechat.ui.LoginActivity"
