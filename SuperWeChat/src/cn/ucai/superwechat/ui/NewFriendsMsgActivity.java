@@ -39,7 +39,7 @@ public class NewFriendsMsgActivity extends BaseActivity {
 		InviteMessgeDao dao = new InviteMessgeDao(this);
 		//列表的数据为邀请消息的对象,用的是数据库里的消息表
 		List<InviteMessage> msgs = dao.getMessagesList();
-
+		//// FIXME: 2017/4/6 图片加载完就是导入图片
 		NewFriendsMsgAdapter adapter = new NewFriendsMsgAdapter(this, 1, msgs);
 		listView.setAdapter(adapter);
 		dao.saveUnreadMessageCount(0);

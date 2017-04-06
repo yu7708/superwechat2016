@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.easemob.redpacketsdk.constant.RPConstant;
@@ -29,6 +30,8 @@ import com.hyphenate.chat.EMMessage.Type;
 import com.hyphenate.chat.EMOptions;
 import com.hyphenate.chat.EMTextMessageBody;
 
+import cn.ucai.superwechat.db.IUserModel;
+import cn.ucai.superwechat.db.OnCompleteListener;
 import cn.ucai.superwechat.db.SuperWeChatDBManager;
 import cn.ucai.superwechat.db.InviteMessgeDao;
 import cn.ucai.superwechat.db.UserDao;
@@ -43,6 +46,9 @@ import cn.ucai.superwechat.ui.MainActivity;
 import cn.ucai.superwechat.ui.VideoCallActivity;
 import cn.ucai.superwechat.ui.VoiceCallActivity;
 import cn.ucai.superwechat.utils.PreferenceManager;
+import cn.ucai.superwechat.utils.Result;
+import cn.ucai.superwechat.utils.ResultUtils;
+
 import com.hyphenate.easeui.controller.EaseUI;
 import com.hyphenate.easeui.controller.EaseUI.EaseEmojiconInfoProvider;
 import com.hyphenate.easeui.controller.EaseUI.EaseSettingsProvider;
@@ -129,7 +135,7 @@ public class SuperWeChatDemoHelper {
 
     private InviteMessgeDao inviteMessgeDao;
     private UserDao userDao;
-
+    private IUserModel userModel;
     private LocalBroadcastManager broadcastManager;
 
     private boolean isGroupAndContactListenerRegisted;
@@ -799,12 +805,42 @@ public class SuperWeChatDemoHelper {
         if(inviteMessgeDao == null){
             inviteMessgeDao = new InviteMessgeDao(appContext);
         }
-        inviteMessgeDao.saveMessage(msg);//// FIXME: 2017/4/6 这里写保存的方法
+        syncUserInfoAddMsg(msg);
+        //inviteMessgeDao.saveMessage(msg);//// FIXME: 2017/4/6 这里写保存的方法
         //increase the unread message count
         //这么设置,显示的数量只能是1,不会改变
         inviteMessgeDao.saveUnreadMessageCount(1);
         // notify there is new message
         getNotifier().vibrateAndPlayTone(null);
+    }
+    //// FIXME: 2017/4/6 异步消息处理添加联系人的信息
+    private void syncUserInfoAddMsg(final InviteMessage msg) {
+        //保存发送的消息
+       //inviteMessgeDao.saveMessage(msg);//msg是一个对象,新的朋友这个对象
+        //加载头像和昵称
+        userModel.loadUserInfo(appContext, msg.getFrom(),
+                new OnCompleteListener<String>() {
+                    @Override
+                    public void onSuccess(String s) {
+                        if(s!=null){
+                            Result result = ResultUtils.getResultFromJson(s, User.class);
+                            if(result!=null&&result.isRetMsg()){
+                               User user= (User) result.getRetData();
+                                if(user!=null){
+                                    Log.e(TAG,"syncUserInfoAddMsg,onSuccess="+s+",user="+user);
+                                    msg.setNickName(user.getMUserNick());
+                                    msg.setAvatar(user.getAvatar());
+                                }
+                            }
+                        }
+                        inviteMessgeDao.saveMessage(msg);//不管有没有成功,都保存这个消息
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        inviteMessgeDao.saveMessage(msg);
+                    }
+                });
     }
 
     /**

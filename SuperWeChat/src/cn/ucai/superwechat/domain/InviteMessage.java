@@ -16,7 +16,9 @@ package cn.ucai.superwechat.domain;
 import java.io.Serializable;
 
 public class InviteMessage implements Serializable{
+	//from是用户的用户名
 	private String from;
+
 	private long time;
 	private String reason;
 	private String nickName;
@@ -98,7 +100,7 @@ public class InviteMessage implements Serializable{
 	}
 
 	public String getNickName() {
-		return nickName;
+		return nickName==null?from:nickName;
 	}
 
 	public void setNickName(String nickName) {

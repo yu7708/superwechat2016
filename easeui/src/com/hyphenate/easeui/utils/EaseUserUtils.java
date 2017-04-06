@@ -89,6 +89,20 @@ public class EaseUserUtils {
             Glide.with(context).load(R.drawable.ease_default_avatar).into(imageView);
         }
     }
+    public static void setAppAvatar(Context context, String avatarPath, ImageView imageView){
+        //User user = getAppUserInfo(username);
+        if(avatarPath!=null){
+            try {
+                int avatarResId = Integer.parseInt(avatarPath);
+                Glide.with(context).load(avatarResId).into(imageView);
+            } catch (Exception e) {
+                //use default avatar
+                Glide.with(context).load(avatarPath).diskCacheStrategy(DiskCacheStrategy.ALL).placeholder(R.drawable.ease_default_avatar).into(imageView);
+            }
+        }else{
+            Glide.with(context).load(R.drawable.ease_default_avatar).into(imageView);
+        }
+    }
     //// FIXME: 2017/3/31 思考两个头像的方法,差不多,合并多写个方法
 
     //// FIXME: 2017/3/31 //设置昵称
