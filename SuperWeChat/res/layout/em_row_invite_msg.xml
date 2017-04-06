@@ -6,6 +6,7 @@
     android:orientation="vertical" >
 
     <RelativeLayout
+        android:id="@+id/rl_new_friend"
         android:layout_width="match_parent"
         android:layout_height="@dimen/height_row_weixin"
         android:gravity="center_vertical" >

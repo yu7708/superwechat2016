@@ -22,6 +22,7 @@ import cn.ucai.superwechat.R;
 import cn.ucai.superwechat.db.InviteMessgeDao;
 import cn.ucai.superwechat.domain.InviteMessage;
 import cn.ucai.superwechat.domain.InviteMessage.InviteMesageStatus;
+import cn.ucai.superwechat.utils.MFGT;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -35,6 +36,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,36 +65,38 @@ public class NewFriendsMsgAdapter extends ArrayAdapter<InviteMessage> {
 			holder.groupContainer = (LinearLayout) convertView.findViewById(R.id.ll_group);
 			holder.groupname = (TextView) convertView.findViewById(R.id.tv_groupName);
 			// holder.time = (TextView) convertView.findViewById(R.id.time);
-			convertView.setTag(holder);
+            //// FIXME: 2017/4/6 点击添加的人的那一行显示详情
+            holder.rlNewFriend= (RelativeLayout) convertView.findViewById(R.id.rl_new_friend);
+            convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
-		
+
 		String str1 = context.getResources().getString(R.string.Has_agreed_to_your_friend_request);
 		String str2 = context.getResources().getString(R.string.agree);
-		
+
 		String str3 = context.getResources().getString(R.string.Request_to_add_you_as_a_friend);
 		String str4 = context.getResources().getString(R.string.Apply_to_the_group_of);
 		String str5 = context.getResources().getString(R.string.Has_agreed_to);
 		String str6 = context.getResources().getString(R.string.Has_refused_to);
-		
+
 		String str7 = context.getResources().getString(R.string.refuse);
 		String str8 = context.getResources().getString(R.string.invite_join_group);
         String str9 = context.getResources().getString(R.string.accept_join_group);
 		String str10 = context.getResources().getString(R.string.refuse_join_group);
-		
+
 		final InviteMessage msg = getItem(position);
 		if (msg != null) {
-		    
+
 		    holder.agree.setVisibility(View.INVISIBLE);
-		    
+
 			if(msg.getGroupId() != null){ // show group name
 				holder.groupContainer.setVisibility(View.VISIBLE);
 				holder.groupname.setText(msg.getGroupName());
 			} else{
 				holder.groupContainer.setVisibility(View.GONE);
 			}
-			
+
 			holder.reason.setText(msg.getReason());
 			//holder.name.setText(msg.getFrom());//不用显示用户名
 			//// FIXME: 2017/4/6  想要获取添加的人的昵称和头像
@@ -110,7 +114,7 @@ public class NewFriendsMsgAdapter extends ArrayAdapter<InviteMessage> {
                 holder.agree.setEnabled(true);
                 holder.agree.setBackgroundResource(android.R.drawable.btn_default);
                 holder.agree.setText(str2);
-			    
+
 				holder.status.setVisibility(View.VISIBLE);
 				holder.status.setEnabled(true);
 				holder.status.setBackgroundResource(android.R.drawable.btn_default);
@@ -129,7 +133,7 @@ public class NewFriendsMsgAdapter extends ArrayAdapter<InviteMessage> {
                         holder.reason.setText(str8 + msg.getGroupName());
                     }
 				}
-				
+
 				// set click listener
                 holder.agree.setOnClickListener(new OnClickListener() {
                     @Override
@@ -164,6 +168,12 @@ public class NewFriendsMsgAdapter extends ArrayAdapter<InviteMessage> {
                 holder.status.setBackgroundDrawable(null);
                 holder.status.setEnabled(false);
             }
+            holder.rlNewFriend.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MFGT.gotoFriend(context,msg);
+                }
+            });
 		}
 
 		return convertView;
@@ -171,7 +181,7 @@ public class NewFriendsMsgAdapter extends ArrayAdapter<InviteMessage> {
 
 	/**
 	 * accept invitation
-	 * 
+	 *
 	 * @param //button
 	 * @param //username
 	 */
@@ -208,7 +218,7 @@ public class NewFriendsMsgAdapter extends ArrayAdapter<InviteMessage> {
 							buttonAgree.setText(str2);
 							buttonAgree.setBackgroundDrawable(null);
 							buttonAgree.setEnabled(false);
-							
+
 							buttonRefuse.setVisibility(View.INVISIBLE);
 						}
 					});
@@ -226,10 +236,10 @@ public class NewFriendsMsgAdapter extends ArrayAdapter<InviteMessage> {
 			}
 		}).start();
 	}
-	
+
 	/**
      * decline invitation
-     * 
+     *
      * @param //button
      * @param //username
      */
@@ -286,6 +296,7 @@ public class NewFriendsMsgAdapter extends ArrayAdapter<InviteMessage> {
     }
 
 	private static class ViewHolder {
+        RelativeLayout rlNewFriend;
 		ImageView avator;
 		TextView name;
 		TextView reason;

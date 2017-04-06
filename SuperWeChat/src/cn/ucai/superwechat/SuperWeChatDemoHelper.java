@@ -72,6 +72,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class SuperWeChatDemoHelper {
+
     /**
      * data sync listener
      */
@@ -725,6 +726,7 @@ public class SuperWeChatDemoHelper {
 
         @Override
         public void onContactAdded(String username) {
+            Log.e(TAG,"MyContactListener,onContactAdded,username="+username);
             // save contact
             Map<String, EaseUser> localUsers = getContactList();
             Map<String, EaseUser> toAddUsers = new HashMap<String, EaseUser>();
@@ -735,8 +737,34 @@ public class SuperWeChatDemoHelper {
             }
             toAddUsers.put(username, user);
             localUsers.putAll(toAddUsers);
-
+            //更新联系人
+            onAppContactAdded(username);
             broadcastManager.sendBroadcast(new Intent(Constant.ACTION_CONTACT_CHANAGED));
+        }
+
+        private void onAppContactAdded(String username) {
+            userModel.addContact(appContext, EMClient.getInstance().getCurrentUser(), username,
+                    new OnCompleteListener<String>() {
+                        @Override
+                        public void onSuccess(String s) {
+                            if(s!=null){
+                                Result result = ResultUtils.getResultFromJson(s, User.class);
+                                if(result!=null&&result.isRetMsg()){
+                                    User user = (User) result.getRetData();
+                                    if(user!=null){
+                                        //保存到内存
+                                        //保存到数据库
+                                        //通知联系人列表更新
+                                    }
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onError(String error) {
+
+                        }
+                    });
         }
 
         @Override
