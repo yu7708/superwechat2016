@@ -38,6 +38,10 @@ public class DbOpenHelper extends SQLiteOpenHelper{
 			+ InviteMessgeDao.COLUMN_NAME_GROUP_ID + " TEXT, "
 			+ InviteMessgeDao.COLUMN_NAME_GROUP_Name + " TEXT, "
 			+ InviteMessgeDao.COLUMN_NAME_REASON + " TEXT, "
+
+			+ InviteMessgeDao.COLUMN_NAME_NICK + " TEXT, "
+			+ InviteMessgeDao.COLUMN_NAME_AVATAR + " TEXT, "
+
 			+ InviteMessgeDao.COLUMN_NAME_STATUS + " INTEGER, "
 			+ InviteMessgeDao.COLUMN_NAME_ISINVITEFROMME + " INTEGER, "
 			+ InviteMessgeDao.COLUMN_NAME_UNREAD_MSG_COUNT + " INTEGER, "

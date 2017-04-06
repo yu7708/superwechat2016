@@ -29,7 +29,7 @@ import java.util.List;
  *
  */
 public class NewFriendsMsgActivity extends BaseActivity {
-
+	//// FIXME: 2017/4/6 自带,显示新的朋友里的列表
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -37,6 +37,7 @@ public class NewFriendsMsgActivity extends BaseActivity {
 
 		ListView listView = (ListView) findViewById(R.id.list);
 		InviteMessgeDao dao = new InviteMessgeDao(this);
+		//列表的数据为邀请消息的对象,用的是数据库里的消息表
 		List<InviteMessage> msgs = dao.getMessagesList();
 
 		NewFriendsMsgAdapter adapter = new NewFriendsMsgAdapter(this, 1, msgs);

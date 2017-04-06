@@ -13,10 +13,14 @@
  */
 package cn.ucai.superwechat.domain;
 
-public class InviteMessage {
+import java.io.Serializable;
+
+public class InviteMessage implements Serializable{
 	private String from;
 	private long time;
 	private String reason;
+	private String nickName;
+	private String avatar;
 
 	private InviteMesageStatus status;
 	private String groupId;
@@ -59,7 +63,7 @@ public class InviteMessage {
 		this.status = status;
 	}
 
-	
+
 	
 	public int getId() {
 		return id;
@@ -93,7 +97,21 @@ public class InviteMessage {
 	    return groupInviter;	    
 	}
 
+	public String getNickName() {
+		return nickName;
+	}
 
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
+
+	public String getAvatar() {
+		return avatar;
+	}
+
+	public void setAvatar(String avatar) {
+		this.avatar = avatar;
+	}
 
 	public enum InviteMesageStatus{
 	    

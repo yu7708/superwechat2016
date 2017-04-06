@@ -799,8 +799,9 @@ public class SuperWeChatDemoHelper {
         if(inviteMessgeDao == null){
             inviteMessgeDao = new InviteMessgeDao(appContext);
         }
-        inviteMessgeDao.saveMessage(msg);
+        inviteMessgeDao.saveMessage(msg);//// FIXME: 2017/4/6 这里写保存的方法
         //increase the unread message count
+        //这么设置,显示的数量只能是1,不会改变
         inviteMessgeDao.saveUnreadMessageCount(1);
         // notify there is new message
         getNotifier().vibrateAndPlayTone(null);
