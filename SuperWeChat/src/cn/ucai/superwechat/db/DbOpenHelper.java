@@ -62,7 +62,7 @@ public class DbOpenHelper extends SQLiteOpenHelper{
 					+ UserDao.USER_COLUMN_AVATAR + " INTEGER,"
 					+ UserDao.USER_COLUMN_AVATAR_PATH + " TEXT,"
 					+ UserDao.USER_COLUMN_AVATAR_SUFFIX + " INTEGER,"
-					+ UserDao.USER_COLUMN_AVATAR_TYPE + " IN,"
+					+ UserDao.USER_COLUMN_AVATAR_TYPE + " INTEGER,"
 					+ UserDao.USER_COLUMN_AVATAR_UPDATE_TIME + " TEXT);";
 	//--f
 	private DbOpenHelper(Context context) {

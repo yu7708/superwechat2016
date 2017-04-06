@@ -85,9 +85,11 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
     @BindView(R.id.txt_right)
     TextView txtRight;
     // textview for unread message count
-    // private TextView unreadLabel;
+    //未读地址数量
+     private TextView unreadLabel;
     // textview for unread event message
-    //private TextView unreadAddressLable;
+    //未读地址标签
+    private TextView unreadAddressLable;
 
     private Button[] mTabs;
     private ContactListFragment contactListFragment;
@@ -410,6 +412,8 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
         Log.e(TAG, "onPageSelected,position=" + position);
         //// FIXME: 2017/3/31 
         layoutTabhost.setChecked(position);//这边设置按钮显示哪个
+        //// FIXME: 2017/4/6 判断红点时的当前下标
+        currentTabIndex=position;
     }
 
     @Override
@@ -423,6 +427,8 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
         //这边显示按钮同步的滑动,两边调用另一方
         //// FIXME: 2017/3/31
         layoutViewpage.setCurrentItem(checkedPosition, false);
+        //// FIXME: 2017/4/6
+        currentTabIndex=checkedPosition;
     }
 
     public class MyContactListener implements EMContactListener {
@@ -485,8 +491,9 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
      * update unread message count
      */
     public void updateUnreadLabel() {
+    /*    //// FIXME: 2017/4/6 显示有消息时的小圆点
         int count = getUnreadMsgCountTotal();
-       /* if (count > 0) {
+        if (count > 0) {
             unreadLabel.setText(String.valueOf(count));
             unreadLabel.setVisibility(View.VISIBLE);
         } else {
@@ -498,16 +505,18 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
      * update the total unread count
      */
     public void updateUnreadAddressLable() {
-     /*   runOnUiThread(new Runnable() {
+        //// FIXME: 2017/4/6 显示有消息时的小圆点
+        runOnUiThread(new Runnable() {
             public void run() {
                 int count = getUnreadAddressCountTotal();
-                if (count > 0) {
+                layoutTabhost.setHasNew(1,count>0);
+               /* if (count > 0) {
                     unreadAddressLable.setVisibility(View.VISIBLE);
                 } else {
                     unreadAddressLable.setVisibility(View.INVISIBLE);
-                }
+                }*/
             }
-        });*/
+        });
 
     }
 
