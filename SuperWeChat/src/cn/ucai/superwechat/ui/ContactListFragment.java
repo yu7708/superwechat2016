@@ -28,6 +28,7 @@ import cn.ucai.superwechat.widget.TitleMenu.ActionItem;
 import cn.ucai.superwechat.widget.TitleMenu.TitlePopup;
 
 import com.hyphenate.easeui.domain.EaseUser;
+import com.hyphenate.easeui.domain.User;
 import com.hyphenate.easeui.ui.EaseContactListFragment;
 import com.hyphenate.util.EMLog;
 import com.hyphenate.util.NetUtils;
@@ -83,10 +84,11 @@ TitlePopup mPopup;
     
     @Override
     public void refresh() {
-        Map<String, EaseUser> m = cn.ucai.superwechat.SuperWeChatDemoHelper.getInstance().getContactList();
+        //// FIXME: 2017/4/7 这里我们要换源,把原生的环信的改成自己的\
+        Map<String, User> m = cn.ucai.superwechat.SuperWeChatDemoHelper.getInstance().getAppContactList();
         if (m instanceof Hashtable<?, ?>) {
             //noinspection unchecked
-            m = (Map<String, EaseUser>) ((Hashtable<String, EaseUser>)m).clone();
+            m = (Map<String, User>) ((Hashtable<String, User>)m).clone();
         }
         setContactsMap(m);
         super.refresh();
@@ -124,9 +126,9 @@ TitlePopup mPopup;
             }
         });
         //设置联系人数据
-        Map<String, EaseUser> m = cn.ucai.superwechat.SuperWeChatDemoHelper.getInstance().getContactList();
+        Map<String, User> m = cn.ucai.superwechat.SuperWeChatDemoHelper.getInstance().getAppContactList();
         if (m instanceof Hashtable<?, ?>) {
-            m = (Map<String, EaseUser>) ((Hashtable<String, EaseUser>)m).clone();
+            m = (Map<String, User>) ((Hashtable<String, User>)m).clone();
         }
         setContactsMap(m);
         super.setUpView();
@@ -134,9 +136,9 @@ TitlePopup mPopup;
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                EaseUser user = (EaseUser)listView.getItemAtPosition(position);
+                User user = (User)listView.getItemAtPosition(position);
                 if (user != null) {
-                    String username = user.getUsername();
+                    String username = user.getMUserName();
                     // demo中直接进入聊天页面，实际一般是进入用户详情页
                     startActivity(new Intent(getActivity(), ChatActivity.class).putExtra("userId", username));
                 }
