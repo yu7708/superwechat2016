@@ -727,22 +727,24 @@ public class SuperWeChatDemoHelper {
         @Override
         public void onContactAdded(String username) {
             Log.e(TAG,"MyContactListener,onContactAdded,username="+username);
-            // save contact
+            // save contact//本地的内存里面的数据
             Map<String, EaseUser> localUsers = getContactList();
             Map<String, EaseUser> toAddUsers = new HashMap<String, EaseUser>();
             EaseUser user = new EaseUser(username);
 
-            if (!localUsers.containsKey(username)) {
+            if (!localUsers.containsKey(username)) {//如果内存里没有,就保存在数据库里
                 userDao.saveContact(user);
             }
             toAddUsers.put(username, user);
             localUsers.putAll(toAddUsers);
             //更新联系人
             onAppContactAdded(username);
+            //通知更新
             broadcastManager.sendBroadcast(new Intent(Constant.ACTION_CONTACT_CHANAGED));
         }
-
-        private void onAppContactAdded(String username) {
+        
+        //// FIXME: 2017/4/7 这里的username指的是好友
+        private void onAppContactAdded(final String username) {
             userModel.addContact(appContext, EMClient.getInstance().getCurrentUser(), username,
                     new OnCompleteListener<String>() {
                         @Override
@@ -752,9 +754,17 @@ public class SuperWeChatDemoHelper {
                                 if(result!=null&&result.isRetMsg()){
                                     User user = (User) result.getRetData();
                                     if(user!=null){
-                                        //保存到内存
                                         //保存到数据库
+                                        //首先我们也得拿到我们内存的数据,遇上面的一样
+                                        Map<String, User> appContactList = getAppContactList();
+                                        //然后就是判段是否是好友
+                                        if(appContactList.containsValue(username)){
+                                            userDao.saveAppContact(user);//添加到数据库里
+                                        }
+                                        //保存到内存,内存是指的SuperWeChatDemoHelper吗
+                                        getAppContactList().put(user.getMUserName(),user);//键值是用户名,值是对象
                                         //通知联系人列表更新
+                                        broadcastManager.sendBroadcast(new Intent(Constant.ACTION_CONTACT_CHANAGED));
                                     }
                                 }
                             }
