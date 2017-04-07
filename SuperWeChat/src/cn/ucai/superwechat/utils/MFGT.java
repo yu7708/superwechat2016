@@ -9,6 +9,7 @@ import com.hyphenate.easeui.domain.User;
 import cn.ucai.superwechat.I;
 import cn.ucai.superwechat.R;
 import cn.ucai.superwechat.domain.InviteMessage;
+import cn.ucai.superwechat.ui.ChatActivity;
 import cn.ucai.superwechat.ui.GuideActivity;
 import cn.ucai.superwechat.ui.LoginActivity;
 import cn.ucai.superwechat.ui.MainActivity;
@@ -38,6 +39,9 @@ public class MFGT {
     }
     public static void gotoMain(Activity activity){
         startActivity(activity, MainActivity.class);
+    } public static void gotoMain(Activity activity,boolean isChat){
+        startActivity(activity, new Intent(activity,MainActivity.class)
+        .putExtra(I.IS_FROM_CHAT,isChat));
     }
     public static void startActivityForResult(Activity activity,Intent intent,int requestCode){
         activity.startActivityForResult(intent,requestCode);
@@ -75,5 +79,10 @@ public class MFGT {
     public static void gotoSendAddFriend(Activity activity, String userName) {
         startActivity(activity,new Intent(activity,SendAddFriendActivity.class)
         .putExtra(I.User.USER_NAME,userName));
+    }
+
+    public static void gotoChat(Activity activity, String userName) {
+        startActivity(activity,new Intent(activity, ChatActivity.class
+        ).putExtra("userId", userName));
     }
 }

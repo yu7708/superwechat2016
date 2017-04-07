@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -35,6 +36,7 @@ import cn.ucai.superwechat.R;
 import cn.ucai.superwechat.SuperWeChatDemoHelper;
 import cn.ucai.superwechat.domain.EmojiconExampleGroupData;
 import cn.ucai.superwechat.domain.RobotUser;
+import cn.ucai.superwechat.utils.MFGT;
 import cn.ucai.superwechat.widget.ChatRowVoiceCall;
 import com.hyphenate.easeui.EaseConstant;
 import com.hyphenate.easeui.ui.EaseChatFragment;
@@ -51,8 +53,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ChatFragment extends EaseChatFragment implements EaseChatFragmentHelper{
-
-	// constant start from 11 to avoid conflict with constant in base class
+    private static final String TAG = "ChatFragment";
+    // constant start from 11 to avoid conflict with constant in base class
     private static final int ITEM_VIDEO = 11;
     private static final int ITEM_FILE = 12;
     private static final int ITEM_VOICE_CALL = 13;
@@ -107,14 +109,24 @@ public class ChatFragment extends EaseChatFragment implements EaseChatFragmentHe
         super.setUpView();
         // set click listener
         titleBar.setLeftLayoutClickListener(new OnClickListener() {
-
+        //// FIXME: 2017/4/7 要确定哪里发的消息才能返回哪里有代码.
             @Override
             public void onClick(View v) {
-                if (EasyUtils.isSingleActivity(getActivity())) {
+                Log.e(TAG, "onClick: " );
+                //执行,但是不会有这个判段里的数据,但是条件里却是跳转的数据,先注释
+               /* if (EasyUtils.isSingleActivity(getActivity())) {
+                    Log.e(TAG, "onClick:isSingleActivity-----1");
                     Intent intent = new Intent(getActivity(), MainActivity.class);
                     startActivity(intent);
-                }
+                }*/
+                //// FIXME: 2017/4/7 这里是让发消息对话界面点击返回跳转的方法,
+                //传方法,是要有数据才能判断你是怎么返回的那个页面,
+                // 才好更新那个方法的实施,不然无法确定你是从哪里跳转过来的
+                MFGT.gotoMain(getActivity(),true);
+                //---
+                Log.e(TAG, "onClick: ------2");
                 onBackPressed();
+                Log.e(TAG, "onClick: ------3");
             }
         });
         ((EaseEmojiconMenu)inputMenu.getEmojiconMenu()).addEmojiconGroup(EmojiconExampleGroupData.getData());

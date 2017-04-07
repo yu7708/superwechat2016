@@ -84,8 +84,8 @@ public class EaseContactAdapter extends ArrayAdapter<User> implements SectionInd
             holder.headerView.setVisibility(View.GONE);
         }
 
-        EaseUserUtils.setUserNick(username, holder.nameView);
-        EaseUserUtils.setUserAvatar(getContext(), username, holder.avatar);
+        EaseUserUtils.setAppUserNick(username, holder.nameView);
+        EaseUserUtils.setAppUserAvatar(getContext(), username, holder.avatar);
         
        
         if(primaryColor != 0)
@@ -171,16 +171,23 @@ public class EaseContactAdapter extends ArrayAdapter<User> implements SectionInd
                 results.values = copyUserList;
                 results.count = copyUserList.size();
             }else{
-                String prefixString = prefix.toString();
+                //// FIXME: 2017/4/7 添加大小写全变为小写
+                String prefixString = prefix.toString().toLowerCase();
+                //----
                 final int count = mOriginalList.size();
                 final ArrayList<User> newValues = new ArrayList<User>();
                 for(int i=0;i<count;i++){
                     final User user = mOriginalList.get(i);
-                    String username = user.getMUserName();
-                    
-                    if(username.startsWith(prefixString)){
+                    //输入的变味小写字母
+                    String username = user.getMUserName().toLowerCase();
+                    String nickname = user.getMUserNick().toLowerCase();
+                    //模糊查找名字或者昵称
+                    if(username.contains(prefixString)||nickname.contains(prefixString)){
                         newValues.add(user);
                     }
+                  /*  if(username.startsWith(prefixString)){
+                        newValues.add(user);
+                    }*/
                     else{
                          final String[] words = username.split(" ");
                          final int wordCount = words.length;

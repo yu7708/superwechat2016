@@ -1,6 +1,7 @@
 package cn.ucai.superwechat.ui.activity;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -23,6 +24,7 @@ import cn.ucai.superwechat.db.OnCompleteListener;
 import cn.ucai.superwechat.db.UserModel;
 import cn.ucai.superwechat.domain.InviteMessage;
 import cn.ucai.superwechat.ui.BaseActivity;
+import cn.ucai.superwechat.ui.ChatActivity;
 import cn.ucai.superwechat.utils.MFGT;
 import cn.ucai.superwechat.utils.Result;
 import cn.ucai.superwechat.utils.ResultUtils;
@@ -162,5 +164,11 @@ public class FriendProfileActivity extends BaseActivity {
 
                     }
                 });
+    }
+    @OnClick(R.id.btn_send_msg)
+    public void sendMsg(){
+        finish();
+        //跳转到chat页面,传个名字
+        MFGT.gotoChat(FriendProfileActivity.this,user.getMUserName());
     }
 }

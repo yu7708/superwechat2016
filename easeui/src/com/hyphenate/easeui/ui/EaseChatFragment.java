@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -40,6 +41,7 @@ import com.hyphenate.easeui.R;
 import com.hyphenate.easeui.controller.EaseUI;
 import com.hyphenate.easeui.domain.EaseEmojicon;
 import com.hyphenate.easeui.domain.EaseUser;
+import com.hyphenate.easeui.domain.User;
 import com.hyphenate.easeui.model.EaseAtMessageHelper;
 import com.hyphenate.easeui.utils.EaseCommonUtils;
 import com.hyphenate.easeui.utils.EaseUserUtils;
@@ -181,13 +183,16 @@ public class EaseChatFragment extends EaseBaseFragment implements EMMessageListe
     }
 
     protected void setUpView() {
-        titleBar.setTitle(toChatUsername);
+       // titleBar.setTitle(toChatUsername);
+        titleBar.setTitle(toChatUsername+"000");
         if (chatType == EaseConstant.CHATTYPE_SINGLE) {
             // set title
-            if(EaseUserUtils.getUserInfo(toChatUsername) != null){
-                EaseUser user = EaseUserUtils.getUserInfo(toChatUsername);
+            if(EaseUserUtils.getAppUserInfo(toChatUsername) != null){
+               // EaseUser user = EaseUserUtils.getUserInfo(toChatUsername);
+                //// FIXME: 2017/4/7 修改了发送消息的界面的标题显示为好友的昵称
+                User user=EaseUserUtils.getAppUserInfo(toChatUsername);
                 if (user != null) {
-                    titleBar.setTitle(user.getNick());
+                    titleBar.setTitle(user.getMUserNick());
                 }
             }
             titleBar.setRightImageResource(R.drawable.ease_mm_title_remove);
@@ -452,8 +457,17 @@ public class EaseChatFragment extends EaseBaseFragment implements EMMessageListe
     }
 
     public void onBackPressed() {
+        //// FIXME: 2017/4/7 打log判断按了返回键后跳转的问题
+        //title行的返回返回的只有EaseChatFragment的0到3
+        //而按下面的虚拟机自带的返回,返回的是
+        //ChatActivity: onBackPressed:
+        //EaseChatFragment: onBackPressed:------0到3
+        //ChatActivity: onBackPressed:--------1到3
+        Log.e(TAG, "onBackPressed:------");
         if (inputMenu.onBackPressed()) {
+            Log.e(TAG, "onBackPressed: ------1");
             getActivity().finish();
+            Log.e(TAG, "onBackPressed:------2");
             if(chatType == EaseConstant.CHATTYPE_GROUP){
                 EaseAtMessageHelper.get().removeAtMeGroup(toChatUsername);
                 EaseAtMessageHelper.get().cleanToAtUserList();
@@ -462,6 +476,7 @@ public class EaseChatFragment extends EaseBaseFragment implements EMMessageListe
             	EMClient.getInstance().chatroomManager().leaveChatRoom(toChatUsername);
             }
         }
+        Log.e(TAG, "onBackPressed:------3");
     }
 
     protected void onChatRoomViewCreation() {

@@ -59,6 +59,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.ucai.superwechat.Constant;
+import cn.ucai.superwechat.I;
 import cn.ucai.superwechat.R;
 import cn.ucai.superwechat.SuperWeChatDemoHelper;
 import cn.ucai.superwechat.adapter.MainTabAdapter;
@@ -552,7 +553,8 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
     @Override
     protected void onResume() {
         super.onResume();
-
+            //放在这里是返回显示时恢复数据
+            //// FIXME: 2017/4/7 在单例中传intent不能新建实例,再次开启,不是走的oncreate().而是走的onNewIntent()的方法
         if (!isConflict && !isCurrentAccountRemoved) {
             updateUnreadLabel();
             updateUnreadAddressLable();
@@ -660,6 +662,15 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         showExceptionDialogFromIntent(intent);
+        //// FIXME: 2017/4/7 你保存了数据,但是Activity没有停止,你可以得到当时保存的状态,如果是resume()就会丢失
+        boolean isChat = intent.getBooleanExtra(I.IS_FROM_CHAT, false);
+        if(isChat){
+            //成功跳转改变到微信的首页,这只是虚拟键盘的返回键
+            layoutTabhost.setChecked(0);
+            layoutViewpage.setCurrentItem(0);
+        }else{
+
+        }
     }
 
     /**
