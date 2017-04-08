@@ -21,6 +21,7 @@ import com.hyphenate.chat.EMGroup;
 import com.hyphenate.chat.EMMessage;
 import com.hyphenate.easeui.R;
 import com.hyphenate.easeui.domain.EaseUser;
+import com.hyphenate.easeui.domain.User;
 import com.hyphenate.easeui.model.EaseAtMessageHelper;
 import com.hyphenate.easeui.utils.EaseCommonUtils;
 import com.hyphenate.easeui.utils.EaseSmileUtils;
@@ -118,8 +119,9 @@ public class EaseConversationAdapter extends ArrayAdapter<EMConversation> {
             holder.name.setText(room != null && !TextUtils.isEmpty(room.getName()) ? room.getName() : username);
             holder.motioned.setVisibility(View.GONE);
         }else {
-            EaseUserUtils.setUserAvatar(getContext(), username, holder.avatar);
-            EaseUserUtils.setUserNick(username, holder.name);
+            // FIXME: 2017/4/8 会话列表显示联系人的头像和昵称
+            EaseUserUtils.setAppUserAvatar(getContext(), username, holder.avatar);
+            EaseUserUtils.setAppUserNick(username, holder.name);
             holder.motioned.setVisibility(View.GONE);
         }
 
@@ -227,28 +229,34 @@ public class EaseConversationAdapter extends ArrayAdapter<EMConversation> {
                 results.values = copyConversationList;
                 results.count = copyConversationList.size();
             } else {
-                String prefixString = prefix.toString();
+                String prefixString = prefix.toString().toLowerCase();
                 final int count = mOriginalValues.size();
                 final ArrayList<EMConversation> newValues = new ArrayList<EMConversation>();
 
                 for (int i = 0; i < count; i++) {
                     final EMConversation value = mOriginalValues.get(i);
-                    String username = value.conversationId();
-                    
+                    String username = value.conversationId().toLowerCase();
+
+
                     EMGroup group = EMClient.getInstance().groupManager().getGroup(username);
                     if(group != null){
                         username = group.getGroupName();
                     }else{
-                        EaseUser user = EaseUserUtils.getUserInfo(username);
+                        //EaseUser user = EaseUserUtils.getUserInfo(username);
+                        //// FIXME: 2017/4/8 修改为自己的可以通过nick查询
+                        User user=EaseUserUtils.getAppUserInfo(username);
                         // TODO: not support Nick anymore
 //                        if(user != null && user.getNick() != null)
 //                            username = user.getNick();
                     }
 
                     // First match against the whole ,non-splitted value
-                    if (username.startsWith(prefixString)) {
+                    /*if (username.startsWith(prefixString)) {
                         newValues.add(value);
-                    } else{
+                    }*/
+                    if(username.contains(prefixString)){
+                        newValues.add(value);
+                    }else{
                           final String[] words = username.split(" ");
                             final int wordCount = words.length;
 

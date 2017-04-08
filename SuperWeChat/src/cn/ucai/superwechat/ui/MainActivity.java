@@ -492,9 +492,10 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
      * update unread message count
      */
     public void updateUnreadLabel() {
-    /*    //// FIXME: 2017/4/6 显示有消息时的小圆点
+    //// FIXME: 2017/4/8 显示会话列表的消息数量
         int count = getUnreadMsgCountTotal();
-        if (count > 0) {
+        layoutTabhost.setUnreadCount(0,count);
+        /*if (count > 0) {
             unreadLabel.setText(String.valueOf(count));
             unreadLabel.setVisibility(View.VISIBLE);
         } else {
