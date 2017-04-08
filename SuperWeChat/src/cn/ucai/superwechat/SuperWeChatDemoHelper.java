@@ -35,6 +35,7 @@ import cn.ucai.superwechat.db.OnCompleteListener;
 import cn.ucai.superwechat.db.SuperWeChatDBManager;
 import cn.ucai.superwechat.db.InviteMessgeDao;
 import cn.ucai.superwechat.db.UserDao;
+import cn.ucai.superwechat.db.UserModel;
 import cn.ucai.superwechat.domain.EmojiconExampleGroupData;
 import cn.ucai.superwechat.domain.InviteMessage;
 import cn.ucai.superwechat.domain.InviteMessage.InviteMesageStatus;
@@ -158,7 +159,8 @@ public class SuperWeChatDemoHelper {
 	 *            application context
 	 */
 	public void init(Context context) {
-	    demoModel = new SuperWeChatModel(context);
+        userModel = new UserModel();
+        demoModel = new SuperWeChatModel(context);
 	    EMOptions options = initChatOptions();
 	    //use default options if options is null
 		if (EaseUI.getInstance().init(context, options)) {
@@ -468,13 +470,14 @@ public class SuperWeChatDemoHelper {
                     }
 
                     if (!isContactsSyncedWithServer) {
-                        asyncFetchContactsFromServer(null);
+                       asyncFetchContactsFromServer(null);
                     }
 
                     if (!isBlackListSyncedWithServer) {
                         asyncFetchBlackListFromServer(null);
                     }
                 }
+//                asyncFetchContactsFromServer(null);
             }
         };
 
@@ -762,7 +765,7 @@ public class SuperWeChatDemoHelper {
                                             userDao.saveAppContact(user);//添加到数据库里
                                         }
                                         //保存到内存,内存是指的SuperWeChatDemoHelper吗
-                                        getAppContactList().put(user.getMUserName(),user);//键值是用户名,值是对象
+                                        appContactList.put(user.getMUserName(),user);//键值是用户名,值是对象
                                         //通知联系人列表更新
                                         broadcastManager.sendBroadcast(new Intent(Constant.ACTION_CONTACT_CHANAGED));
                                     }
@@ -779,9 +782,16 @@ public class SuperWeChatDemoHelper {
 
         @Override
         public void onContactDeleted(String username) {
+            Log.e(TAG, "onContactDeleted: username="+username);
             Map<String, EaseUser> localUsers = cn.ucai.superwechat.SuperWeChatDemoHelper.getInstance().getContactList();
+           //// FIXME: 2017/4/8 删除本地的联系人
+            SuperWeChatDemoHelper.getInstance().getAppContactList().remove(username);
+            //----f
             localUsers.remove(username);
             userDao.deleteContact(username);
+            //// FIXME: 2017/4/8 删除数据库里的联系人
+            userDao.deleteAppContact(username);
+            //----f
             inviteMessgeDao.deleteMessage(username);
 
             EMClient.getInstance().chatManager().deleteConversation(username, false);
@@ -1268,14 +1278,65 @@ public class SuperWeChatDemoHelper {
            listener.onSyncComplete(success);
        }
    }
-   
+    //// FIXME: 2017/4/7 异步获取联系人
+    public void asyncFetchAppContactsFromServer(){
+        if (isLoggedIn()) {
+            userModel.loadContact(appContext, SuperWeChatDemoHelper.getInstance().getCurrentUsernName(), new OnCompleteListener<String>() {
+                @Override
+                public void onSuccess(String s) {
+                    if (s != null) {
+                        Result result = ResultUtils.getListResultFromJson(s, User.class);
+                        if (result != null && result.isRetMsg()) {
+                            isContactsSyncedWithServer = true;
+                            isSyncingContactsWithServer = false;
+
+                            //notify sync success
+                            notifyContactsSyncListener(true);
+                            List<User> list = (List<User>) result.getRetData();
+                            //// FIXME: 2017/4/7 拿的下面异步获取数组后的保存到数据库里的方法
+                            Map<String, User> userlist = new HashMap<String, User>();
+                            for (User user : list) {
+                                EaseCommonUtils.setAppUserInitialLetter(user);
+                                userlist.put(user.getMUserName(), user);
+                            }
+                            // save the contact list to cache
+                            //保存联系人列表到缓存
+                            getAppContactList().clear();
+                            getAppContactList().putAll(userlist);
+                            // save the contact list to database
+                            //保存联系人列表到数据库
+                            UserDao dao = new UserDao(appContext);
+                            List<User> users = new ArrayList<User>(userlist.values());
+                            dao.saveAppContactList(users);
+                            //还得设置退出刷新,不然,读取的还是第一个登录的帐号的列表
+                            //同类中有个logout方法,里面有个reset()方法.
+                        }
+                    }
+                }
+
+                @Override
+                public void onError(String error) {
+
+                }
+            });
+        } else {
+            reset();
+            isContactsSyncedWithServer = false;
+            isSyncingContactsWithServer = false;
+            notifyContactsSyncListener(false);
+        }
+    }
+    //从服务器异步读取联系人
    public void asyncFetchContactsFromServer(final EMValueCallBack<List<String>> callback){
        if(isSyncingContactsWithServer){
            return;
        }
        
        isSyncingContactsWithServer = true;
-       
+       //// FIXME: 2017/4/7 这里是环信的自带的获取一组联系人的方法,我们这里借用
+       //仿照他的做法,先判断登录没有
+       asyncFetchAppContactsFromServer();
+       //---
        new Thread(){
            @Override
            public void run(){
@@ -1284,6 +1345,7 @@ public class SuperWeChatDemoHelper {
                    usernames = EMClient.getInstance().contactManager().getAllContactsFromServer();
                    // in case that logout already before server returns, we should return immediately
                    if(!isLoggedIn()){
+                       //判读,提出标志位
                        isContactsSyncedWithServer = false;
                        isSyncingContactsWithServer = false;
                        notifyContactsSyncListener(false);
@@ -1297,9 +1359,11 @@ public class SuperWeChatDemoHelper {
                        userlist.put(username, user);
                    }
                    // save the contact list to cache
+                   //保存联系人列表到缓存
                    getContactList().clear();
                    getContactList().putAll(userlist);
                     // save the contact list to database
+                   //保存联系人列表到数据库
                    UserDao dao = new UserDao(appContext);
                    List<EaseUser> users = new ArrayList<EaseUser>(userlist.values());
                    dao.saveContactList(users);
@@ -1312,7 +1376,8 @@ public class SuperWeChatDemoHelper {
                    
                    //notify sync success
                    notifyContactsSyncListener(true);
-                   
+                   //拉取加载联系人从服务器上
+                   //getUserProfileManager()实际就是UserProfileManager的引用常量,多加了判断减少多余的new实例化
                    getUserProfileManager().asyncFetchContactInfosFromServer(usernames,new EMValueCallBack<List<EaseUser>>() {
 
                        @Override
@@ -1442,6 +1507,9 @@ public class SuperWeChatDemoHelper {
         isGroupAndContactListenerRegisted = false;
         
         setContactList(null);
+        //// FIXME: 2017/4/8 后加的清空联系人
+        setAppContactList(null);
+        //---
         setRobotList(null);
         getUserProfileManager().reset();
         SuperWeChatDBManager.getInstance().closeDB();
@@ -1488,12 +1556,16 @@ public class SuperWeChatDemoHelper {
      * @return
      */
     public Map<String, User> getAppContactList() {
+        Log.e(TAG, "getAppContactList: ....." );
         if (isLoggedIn() && appContactList == null) {
+            Log.e(TAG, "getAppContactList: getAppContactList到数据库取得数据" );
             appContactList = demoModel.getAppContactList();
         }
 
         // return a empty non-null object to avoid app crash
         if(appContactList == null){
+            Log.e(TAG, "getAppContactList: ....appContactList="+appContactList.size());
+            Log.e(TAG, "getAppContactList: ....appContactList.containsKey" );
             return new Hashtable<String, User>();
         }
 

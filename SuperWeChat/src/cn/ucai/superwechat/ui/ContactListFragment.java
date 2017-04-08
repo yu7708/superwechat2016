@@ -21,9 +21,14 @@ import com.hyphenate.chat.EMClient;
 import cn.ucai.superwechat.SuperWeChatDemoHelper;
 import cn.ucai.superwechat.SuperWeChatDemoHelper.DataSyncListener;
 import cn.ucai.superwechat.R;
+import cn.ucai.superwechat.db.IUserModel;
 import cn.ucai.superwechat.db.InviteMessgeDao;
+import cn.ucai.superwechat.db.OnCompleteListener;
 import cn.ucai.superwechat.db.UserDao;
+import cn.ucai.superwechat.db.UserModel;
 import cn.ucai.superwechat.utils.MFGT;
+import cn.ucai.superwechat.utils.Result;
+import cn.ucai.superwechat.utils.ResultUtils;
 import cn.ucai.superwechat.widget.ContactItemView;
 import cn.ucai.superwechat.widget.TitleMenu.ActionItem;
 import cn.ucai.superwechat.widget.TitleMenu.TitlePopup;
@@ -37,6 +42,7 @@ import com.hyphenate.util.NetUtils;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -62,6 +68,7 @@ public class ContactListFragment extends EaseContactListFragment {
     private View loadingView;
     private ContactItemView applicationItem;
     private InviteMessgeDao inviteMessgeDao;
+    ProgressDialog pd;
 TitlePopup mPopup;
     @SuppressLint("InflateParams")
     @Override
@@ -162,14 +169,14 @@ TitlePopup mPopup;
         SuperWeChatDemoHelper.getInstance().addSyncContactListener(contactSyncListener);
         
         blackListSyncListener = new BlackListSyncListener();
-        cn.ucai.superwechat.SuperWeChatDemoHelper.getInstance().addSyncBlackListListener(blackListSyncListener);
+        SuperWeChatDemoHelper.getInstance().addSyncBlackListListener(blackListSyncListener);
         
         contactInfoSyncListener = new ContactInfoSyncListener();
         cn.ucai.superwechat.SuperWeChatDemoHelper.getInstance().getUserProfileManager().addSyncContactInfoListener(contactInfoSyncListener);
         
-        if (cn.ucai.superwechat.SuperWeChatDemoHelper.getInstance().isContactsSyncedWithServer()) {
+        if (SuperWeChatDemoHelper.getInstance().isContactsSyncedWithServer()) {
             loadingView.setVisibility(View.GONE);
-        } else if (cn.ucai.superwechat.SuperWeChatDemoHelper.getInstance().isSyncingContactsWithServer()) {
+        } else if (SuperWeChatDemoHelper.getInstance().isSyncingContactsWithServer()) {
             loadingView.setVisibility(View.VISIBLE);
         }
     }
@@ -225,20 +232,24 @@ TitlePopup mPopup;
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
-	    toBeProcessUser = (EaseUser) listView.getItemAtPosition(((AdapterContextMenuInfo) menuInfo).position);
-	    toBeProcessUsername = toBeProcessUser.getUsername();
+        //// FIXME: 2017/4/8 长按好友程序崩溃,改了EaseUser为user
+        toBeProcessUser = (User) listView.getItemAtPosition(((AdapterContextMenuInfo) menuInfo).position);
+	    toBeProcessUsername = toBeProcessUser.getMUserName();
 		getActivity().getMenuInflater().inflate(R.menu.em_context_contact_list, menu);
 	}
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
+        //// FIXME: 2017/4/8 点击判断执行删除有没有走这里的方法
+        Log.e(TAG, "onContextItemSelected: user="+toBeProcessUser);
+        //如果点击的是删除按钮
 		if (item.getItemId() == R.id.delete_contact) {
 			try {
-                // delete contact
+                // delete contact删除联系人,这里写的是环信的删除,我们也在这个方法里面写,
                 deleteContact(toBeProcessUser);
                 // remove invitation message
                 InviteMessgeDao dao = new InviteMessgeDao(getActivity());
-                dao.deleteMessage(toBeProcessUser.getUsername());
+                dao.deleteMessage(toBeProcessUser.getMUserName());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -256,44 +267,75 @@ TitlePopup mPopup;
 	 * 
 	 * @param tobeDeleteUser
 	 */
-	public void deleteContact(final EaseUser tobeDeleteUser) {
+	public void deleteContact(final User tobeDeleteUser) {
 		String st1 = getResources().getString(R.string.deleting);
-		final String st2 = getResources().getString(R.string.Delete_failed);
-		final ProgressDialog pd = new ProgressDialog(getActivity());
+		pd = new ProgressDialog(getActivity());
 		pd.setMessage(st1);
 		pd.setCanceledOnTouchOutside(false);
 		pd.show();
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					EMClient.getInstance().contactManager().deleteContact(tobeDeleteUser.getUsername());
-					// remove user from memory and database
-					UserDao dao = new UserDao(getActivity());
-					dao.deleteContact(tobeDeleteUser.getUsername());
-					cn.ucai.superwechat.SuperWeChatDemoHelper.getInstance().getContactList().remove(tobeDeleteUser.getUsername());
-					getActivity().runOnUiThread(new Runnable() {
-						public void run() {
-							pd.dismiss();
-							contactList.remove(tobeDeleteUser);
-							contactListLayout.refresh();
-
-						}
-					});
-				} catch (final Exception e) {
-					getActivity().runOnUiThread(new Runnable() {
-						public void run() {
-							pd.dismiss();
-							Toast.makeText(getActivity(), st2 + e.getMessage(), Toast.LENGTH_LONG).show();
-						}
-					});
-
-				}
-
-			}
-		}).start();
-
+        removeContact(tobeDeleteUser);
 	}
-	
+    private void removeEMContact(final User tobeDeleteUser){
+        final String st2 = getResources().getString(R.string.Delete_failed);
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    EMClient.getInstance().contactManager().deleteContact(tobeDeleteUser.getMUserName());
+                    // remove user from memory and database
+                    //从数据库中删除联系人
+                    UserDao dao = new UserDao(getActivity());
+                    // FIXME: 2017/4/8 仿造环信删除数据库里的联系人
+                    // FIXME: 2017/4/8 在这边删除了一次数据库,为什么在SuperWechatHelper的onContactDeleted()中也删除了数据库
+                    dao.deleteAppContact(tobeDeleteUser.getMUserName());
+                    SuperWeChatDemoHelper.getInstance().getAppContactList().remove(tobeDeleteUser.getMUserName());
+                    ///----还得从服务器上请求删除联系人.-----f
+                    dao.deleteContact(tobeDeleteUser.getMUserName());
+                    SuperWeChatDemoHelper.getInstance().getContactList().remove(tobeDeleteUser.getMUserName());
+                    getActivity().runOnUiThread(new Runnable() {
+                        public void run() {
+                            pd.dismiss();
+                            contactList.remove(tobeDeleteUser);
+                            contactListLayout.refresh();
+
+                        }
+                    });
+                } catch (final Exception e) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        public void run() {
+                            pd.dismiss();
+                            Toast.makeText(getActivity(), st2 + e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                }
+
+            }
+        }).start();
+
+    }
+    //// FIXME: 2017/4/8 网络请求删除联系人,还得加层保护,先网络请求删除了联系人再数据库等本地删除
+    private void removeContact(final User tobeDeleteUser){
+        IUserModel userModel=new UserModel();
+        userModel.deleteContact(getContext(), EMClient.getInstance().getCurrentUser(), tobeDeleteUser.getMUserName(),
+                new OnCompleteListener<String>() {
+                    @Override
+                    public void onSuccess(String s) {
+                        if(s!=null){
+                            Result result = ResultUtils.getResultFromJson(s, User.class);
+                            if(result!=null&&result.isRetMsg()){
+                                //执行删除,把上面的方法拆分一下,调用分离出来的环信的方法
+                                removeEMContact(tobeDeleteUser);
+                            }
+                        }
+                    }
+                    @Override
+                    public void onError(String error) {
+                        final String st2 = getResources().getString(R.string.Delete_failed);
+                        pd.dismiss();
+                        Toast.makeText(getActivity(), st2 , Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
 	class ContactSyncListener implements DataSyncListener{
         @Override
         public void onSyncComplete(final boolean success) {

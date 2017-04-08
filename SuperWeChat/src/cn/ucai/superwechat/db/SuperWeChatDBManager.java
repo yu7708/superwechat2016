@@ -44,6 +44,7 @@ public class SuperWeChatDBManager {
      * 
      * @param contactList
      */
+    //保存一组联系人
     synchronized public void saveContactList(List<EaseUser> contactList) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         if (db.isOpen()) {
@@ -65,6 +66,7 @@ public class SuperWeChatDBManager {
      * 
      * @return
      */
+    //得到一组联系人
     synchronized public Map<String, EaseUser> getContactList() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Map<String, EaseUser> users = new Hashtable<String, EaseUser>();
@@ -105,6 +107,7 @@ public class SuperWeChatDBManager {
      * save a contact
      * @param user
      */
+    //保存一个联系人
     synchronized public void saveContact(EaseUser user){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();

@@ -1,6 +1,7 @@
 package cn.ucai.superwechat.ui;
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem;
@@ -26,7 +27,7 @@ import com.hyphenate.easeui.widget.EaseConversationList.EaseConversationListHelp
 import com.hyphenate.util.NetUtils;
 
 public class ConversationListFragment extends EaseConversationListFragment{
-
+    private static final String TAG = "ConversationListFragmen";
     private TextView errorText;
 
     @Override
@@ -121,11 +122,16 @@ public class ConversationListFragment extends EaseConversationListFragment{
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        //// FIXME: 2017/4/8 同时也看看环信的会话列表里删除对话是怎么样的
+        Log.e(TAG, "onContextItemSelected: user会话列表所选项删除" );
         boolean deleteMessage = false;
         if (item.getItemId() == R.id.delete_message) {
             deleteMessage = true;
         } else if (item.getItemId() == R.id.delete_conversation) {
             deleteMessage = false;
+        }else {
+            //删除会执行这个方法,但是你删除的是联系人,这边也应该没有.虽然在qq上是有的,删除后,记录还在.
+            return false;
         }
     	EMConversation tobeDeleteCons = conversationListView.getItem(((AdapterContextMenuInfo) item.getMenuInfo()).position);
     	if (tobeDeleteCons == null) {
@@ -146,7 +152,8 @@ public class ConversationListFragment extends EaseConversationListFragment{
 
         // update unread count
         ((MainActivity) getActivity()).updateUnreadLabel();
-        return true;
+        //// FIXME: 2017/4/8 删除列表项里这里改为false是为什么
+        return false;
     }
 
 }
