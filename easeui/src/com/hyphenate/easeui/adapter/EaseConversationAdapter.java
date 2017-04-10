@@ -236,7 +236,8 @@ public class EaseConversationAdapter extends ArrayAdapter<EMConversation> {
                 for (int i = 0; i < count; i++) {
                     final EMConversation value = mOriginalValues.get(i);
                     String username = value.conversationId().toLowerCase();
-
+                    //// FIXME: 2017/4/10 会话列表模糊查询
+                    String nickname="";
 
                     EMGroup group = EMClient.getInstance().groupManager().getGroup(username);
                     if(group != null){
@@ -246,15 +247,20 @@ public class EaseConversationAdapter extends ArrayAdapter<EMConversation> {
                         //// FIXME: 2017/4/8 修改为自己的可以通过nick查询
                         User user=EaseUserUtils.getAppUserInfo(username);
                         // TODO: not support Nick anymore
-//                        if(user != null && user.getNick() != null)
+//                       if(user != null && user.getNick() != null)
 //                            username = user.getNick();
+                        //// FIXME: 2017/4/10
+                        if(user!=null&&user.getMUserNick()!=null){
+                            nickname=user.getMUserNick().toLowerCase();
+                        }
+                        //-----f
                     }
 
                     // First match against the whole ,non-splitted value
                     /*if (username.startsWith(prefixString)) {
                         newValues.add(value);
                     }*/
-                    if(username.contains(prefixString)){
+                    if(username.contains(prefixString)||nickname.contains(prefixString)){
                         newValues.add(value);
                     }else{
                           final String[] words = username.split(" ");
