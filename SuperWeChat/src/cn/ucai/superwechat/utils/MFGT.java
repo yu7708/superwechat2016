@@ -76,6 +76,10 @@ public class MFGT {
         startActivity((Activity) activity,new Intent(activity,FriendProfileActivity.class)
                 .putExtra(I.User.NICK,msg));
     }
+    public static void gotoFriend(Context activity, String username) {
+        startActivity((Activity) activity,new Intent(activity,FriendProfileActivity.class)
+                .putExtra(I.User.USER_NAME,username));
+    }
     public static void gotoSendAddFriend(Activity activity, String userName) {
         startActivity(activity,new Intent(activity,SendAddFriendActivity.class)
         .putExtra(I.User.USER_NAME,userName));

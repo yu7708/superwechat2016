@@ -36,6 +36,7 @@ import cn.ucai.superwechat.R;
 import cn.ucai.superwechat.SuperWeChatDemoHelper;
 import cn.ucai.superwechat.domain.EmojiconExampleGroupData;
 import cn.ucai.superwechat.domain.RobotUser;
+import cn.ucai.superwechat.ui.activity.FriendProfileActivity;
 import cn.ucai.superwechat.utils.MFGT;
 import cn.ucai.superwechat.widget.ChatRowVoiceCall;
 import com.hyphenate.easeui.EaseConstant;
@@ -283,10 +284,16 @@ public class ChatFragment extends EaseChatFragment implements EaseChatFragmentHe
 
     @Override
     public void onAvatarClick(String username) {
+        //// FIXME: 2017/4/10 对话列表点击头像跳转到详情
         //handling when user click avatar
-        Intent intent = new Intent(getActivity(), UserProfileActivity.class);
-        intent.putExtra("username", username);
-        startActivity(intent);
+        //Intent intent = new Intent(getActivity(), UserProfileActivity.class);
+        //intent.putExtra("username", username);
+        //startActivity(intent);
+        if(username!=EMClient.getInstance().getCurrentUser()){
+            MFGT.gotoFriend(getActivity(),username);
+        }else{
+            startActivity(new Intent(getActivity(),UserProfileActivity.class));
+        }
     }
     
     @Override

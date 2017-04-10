@@ -115,11 +115,12 @@ public abstract class EaseChatRow extends LinearLayout {
             }
         }
         //set nickname and avatar
+        //// FIXME: 2017/4/10   显示会话人的头像和昵称
         if(message.direct() == Direct.SEND){
-            EaseUserUtils.setUserAvatar(context, EMClient.getInstance().getCurrentUser(), userAvatarView);
+            EaseUserUtils.setAppUserAvatar(context, EMClient.getInstance().getCurrentUser(), userAvatarView);
         }else{
-            EaseUserUtils.setUserAvatar(context, message.getFrom(), userAvatarView);
-            EaseUserUtils.setUserNick(message.getFrom(), usernickView);
+            EaseUserUtils.setAppUserAvatar(context, message.getFrom(), userAvatarView);
+            EaseUserUtils.setAppUserNick(message.getFrom(), usernickView);
         }
         
         if(deliveredView != null){

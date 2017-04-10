@@ -12,6 +12,8 @@ import android.widget.TextView;
 import com.hyphenate.easeui.domain.User;
 import com.hyphenate.easeui.utils.EaseUserUtils;
 
+import java.io.Serializable;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -84,7 +86,17 @@ public class FriendProfileActivity extends BaseActivity {
                 user.setAvatar(msg.getAvatar());//前面是转化数据,才能传递到下面的showUserInfo()
                 showUserInfo();
             }else {
-                MFGT.finish(FriendProfileActivity.this);
+                //MFGT.finish(FriendProfileActivity.this);
+                //// FIXME: 2017/4/10 点击跳转详情
+                String username = getIntent().getStringExtra(I.User.USER_NAME);
+                if(username!=null){
+                  // user.setMUserName(username);
+                    user=new User(username);
+                    showUserInfo();
+                }
+                else{
+                    MFGT.finish(FriendProfileActivity.this);
+                }
             }
         }
     }
