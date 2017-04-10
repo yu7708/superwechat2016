@@ -70,7 +70,12 @@ public class GroupPickContactsActivity extends BaseActivity {
 		// get contact list
 		final List<User> alluserList = new ArrayList<User>();
 		for (User user : SuperWeChatDemoHelper.getInstance().getAppContactList().values()) {
-			if (!user.getMUserName().equals(Constant.NEW_FRIENDS_USERNAME) & !user.getMUserName().equals(Constant.GROUP_USERNAME) & !user.getMUserName().equals(Constant.CHAT_ROOM) & !user.getMUserName().equals(Constant.CHAT_ROBOT))
+			//// FIXME: 2017/4/10 添加群组点击保存后的显示跳转显示联系人,迭代每一个成员,然后过滤掉4个选项栏和过滤掉自己的名字
+			if (!user.getMUserName().equals(Constant.NEW_FRIENDS_USERNAME) &
+					!user.getMUserName().equals(Constant.GROUP_USERNAME) &
+					!user.getMUserName().equals(Constant.CHAT_ROOM) &
+					!user.getMUserName().equals(Constant.CHAT_ROBOT) &
+					!user.getMUserName().equals(EMClient.getInstance().getCurrentUser()))
 				alluserList.add(user);
 		}
 		// sort the list
@@ -114,6 +119,7 @@ public class GroupPickContactsActivity extends BaseActivity {
 	 */
 	public void save(View v) {
 		List<String> var = getToBeAddMembers();
+		//// FIXME: 2017/4/10 ForResult,在这边得到RESULT_OK,并且返回一个数组
 		setResult(RESULT_OK, new Intent().putExtra("newmembers", var.toArray(new String[var.size()])));
 		finish();
 	}

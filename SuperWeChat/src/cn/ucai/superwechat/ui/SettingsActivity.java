@@ -361,6 +361,8 @@ public class SettingsActivity extends BaseActivity implements OnClickListener {
                 PreferenceManager.getInstance().setCustomAppkey(s.toString());
             }
         });
+        //// FIXME: 2017/4/10 写了隐藏,没有调用,点击设置后有虚拟键盘跳出
+        hideSoftKeyboard();
     }
 
 
