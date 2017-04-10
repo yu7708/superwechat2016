@@ -25,6 +25,8 @@ import cn.ucai.superwechat.db.UserModel;
 import cn.ucai.superwechat.domain.InviteMessage;
 import cn.ucai.superwechat.ui.BaseActivity;
 import cn.ucai.superwechat.ui.ChatActivity;
+import cn.ucai.superwechat.ui.ImageGridActivity;
+import cn.ucai.superwechat.ui.VideoCallActivity;
 import cn.ucai.superwechat.utils.MFGT;
 import cn.ucai.superwechat.utils.Result;
 import cn.ucai.superwechat.utils.ResultUtils;
@@ -170,5 +172,12 @@ public class FriendProfileActivity extends BaseActivity {
         finish();
         //跳转到chat页面,传个名字
         MFGT.gotoChat(FriendProfileActivity.this,user.getMUserName());
+    }
+    @OnClick(R.id.btn_send_video)
+    public void sendVideo(){
+        //// FIXME: 2017/4/10 发送视频聊天的请求
+        startActivity(new Intent(FriendProfileActivity.this, VideoCallActivity.class)
+                .putExtra("username", user.getMUserName())
+                .putExtra("isComingCall", false));
     }
 }
