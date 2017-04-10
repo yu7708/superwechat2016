@@ -16,6 +16,7 @@ package cn.ucai.superwechat.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -44,6 +45,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class GroupPickContactsActivity extends BaseActivity {
+	private static final String TAG = "GroupPickContactsActivi";
 	/** if this is a new group */
 	protected boolean isCreatingNewGroup;
 	private PickContactAdapter contactAdapter;
@@ -118,9 +120,11 @@ public class GroupPickContactsActivity extends BaseActivity {
 	 * @param v
 	 */
 	public void save(View v) {
+		Log.e(TAG,"aaaaa"+v.toString());
 		List<String> var = getToBeAddMembers();
 		//// FIXME: 2017/4/10 ForResult,在这边得到RESULT_OK,并且返回一个数组
 		setResult(RESULT_OK, new Intent().putExtra("newmembers", var.toArray(new String[var.size()])));
+		Log.e(TAG, "save: var"+var );
 		finish();
 	}
 
