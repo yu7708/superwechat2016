@@ -27,7 +27,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hyphenate.chat.EMGroup;
+import com.hyphenate.easeui.utils.EaseUserUtils;
+
+import cn.ucai.superwechat.I;
 import cn.ucai.superwechat.R;
+import cn.ucai.superwechat.domain.Group;
 
 
 import java.util.List;
@@ -52,6 +56,7 @@ public class GroupAdapter extends ArrayAdapter<EMGroup> {
 
 	@Override
 	public int getItemViewType(int position) {
+		//这个显示的是群聊界面0是搜索,1是新建群组,2是添加公开群,3以后是添加的群
 		if (position == 0) {
 			return 0;
 		} else if (position == 1) {
@@ -111,8 +116,10 @@ public class GroupAdapter extends ArrayAdapter<EMGroup> {
 			if (convertView == null) {
 				convertView = inflater.inflate(R.layout.em_row_group, parent, false);
 			}
+			//// FIXME: 2017/4/11 这里是设置群昵称的
 			((TextView) convertView.findViewById(R.id.name)).setText(getItem(position - 3).getGroupName());
-
+			EaseUserUtils.setAppGroupAvatar(getContext(), Group.getAvatar(getItem(position-3).getGroupId()),
+					((ImageView) convertView.findViewById(R.id.avatar)));
 		}
 
 		return convertView;
