@@ -842,7 +842,7 @@ public class GroupDetailsActivity extends BaseActivity implements OnClickListene
 					operationUserId = username;
 					Dialog dialog = createMemberMenuDialog();
 					dialog.show();
-
+					//群主点击管理员时的显示
 					boolean[] adminVisibilities = {
 							true,       //R.id.menu_item_transfer_owner,
 							false,      //R.id.menu_item_add_admin,
@@ -944,7 +944,7 @@ public class GroupDetailsActivity extends BaseActivity implements OnClickListene
 						operationUserId = username;
 						Dialog dialog = createMemberMenuDialog();
 						dialog.show();
-
+						//群员显示
 						boolean[] normalVisibilities = {
 								false,      //R.id.menu_item_transfer_owner,
 								isCurrentOwner(group) ? true : false,       //R.id.menu_item_add_admin,
@@ -955,7 +955,7 @@ public class GroupDetailsActivity extends BaseActivity implements OnClickListene
 								true,       //R.id.menu_item_mute,
 								false,      //R.id.menu_item_unmute
 						};
-
+						//黑名单的显示
 						boolean[] blackListVisibilities = {
 								false,      //R.id.menu_item_transfer_owner,
 								false,      //R.id.menu_item_add_admin,
