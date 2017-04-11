@@ -217,7 +217,7 @@ public class EaseChatFragment extends EaseBaseFragment implements EMMessageListe
             onConversationInit();
             onMessageListInit();
         }
-
+        //// FIXME: 2017/4/11 群详情的左右点击事件
         titleBar.setLeftLayoutClickListener(new OnClickListener() {
 
             @Override
@@ -933,6 +933,7 @@ public class EaseChatFragment extends EaseBaseFragment implements EMMessageListe
      * 
      */
     protected void toGroupDetails() {
+        //群聊
         if (chatType == EaseConstant.CHATTYPE_GROUP) {
             EMGroup group = EMClient.getInstance().groupManager().getGroup(toChatUsername);
             if (group == null) {
@@ -941,7 +942,7 @@ public class EaseChatFragment extends EaseBaseFragment implements EMMessageListe
             }
             if(chatFragmentHelper != null){
                 chatFragmentHelper.onEnterToChatDetails();
-            }
+            }       //聊天室
         }else if(chatType == EaseConstant.CHATTYPE_CHATROOM){
         	if(chatFragmentHelper != null){
         	    chatFragmentHelper.onEnterToChatDetails();

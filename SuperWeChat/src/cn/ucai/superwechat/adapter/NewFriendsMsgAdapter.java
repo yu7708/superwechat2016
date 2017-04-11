@@ -29,7 +29,9 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.nfc.Tag;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -42,7 +44,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class NewFriendsMsgAdapter extends ArrayAdapter<InviteMessage> {
-
+	private static final String TAG = "NewFriendsMsgAdapter";
 	private Context context;
 	private InviteMessgeDao messgeDao;
 
