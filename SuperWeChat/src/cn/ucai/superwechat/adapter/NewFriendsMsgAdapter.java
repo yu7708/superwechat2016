@@ -16,6 +16,7 @@ package cn.ucai.superwechat.adapter;
 import java.util.List;
 
 import com.hyphenate.chat.EMClient;
+import com.hyphenate.easeui.domain.Group;
 import com.hyphenate.easeui.utils.EaseUserUtils;
 
 import cn.ucai.superwechat.R;
@@ -92,16 +93,18 @@ public class NewFriendsMsgAdapter extends ArrayAdapter<InviteMessage> {
 
 			if(msg.getGroupId() != null){ // show group name
 				holder.groupContainer.setVisibility(View.VISIBLE);
-				holder.groupname.setText(msg.getGroupName());
+				//holder.groupname.setText(msg.getGroupName());
+				holder.groupname.setText(msg.getGroupId());
+				EaseUserUtils.setAppGroupAvatar(getContext(), Group.getAvatar(msg.getGroupId()),holder.avator);
 			} else{
 				holder.groupContainer.setVisibility(View.GONE);
+				EaseUserUtils.setAppAvatar(context,msg.getAvatar(),holder.avator);
 			}
 
 			holder.reason.setText(msg.getReason());
 			//holder.name.setText(msg.getFrom());//不用显示用户名
 			//// FIXME: 2017/4/6  想要获取添加的人的昵称和头像
 			holder.name.setText(msg.getNickName());//还要判断名字
-			EaseUserUtils.setAppAvatar(context,msg.getAvatar(),holder.avator);
 			//---
 			// holder.time.setText(DateUtils.getTimestampString(new
 			// Date(msg.getTime())));
