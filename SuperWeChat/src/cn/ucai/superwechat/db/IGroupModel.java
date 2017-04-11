@@ -14,4 +14,5 @@ import cn.ucai.superwechat.utils.OkHttpUtils;
 public interface IGroupModel {
    void newGroup(Context context,String hxid,String groupName,String description,String owner,
                  boolean groupIsPublic,boolean allowInvite,File file,OnCompleteListener<String> listener);
+   void addMembers(Context context, String members, String hxid,OnCompleteListener<String> listener);
 }

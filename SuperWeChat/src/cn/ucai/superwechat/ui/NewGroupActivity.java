@@ -155,7 +155,7 @@ public class NewGroupActivity extends BaseActivity {
 		} else {
 			// select from contact list
 			//跳转到选择群名的Activity,并传了群名,和一个0
-			startActivityForResult(new Intent(this, GroupPickContactsActivity.class).putExtra("groupName", name), 0);
+			startActivityForResult(new Intent(this, GroupPickContactsActivity.class).putExtra("groupName", name), I.REQUEST_CODE_PICK_CONTACT);
 		}
 	}
 	
@@ -275,7 +275,7 @@ public class NewGroupActivity extends BaseActivity {
 					}
 					EMGroup emGroup = EMClient.getInstance().groupManager().createGroup(groupName, desc, members, reason, option);
 					//// FIXME: 2017/4/10 写上自己的添加群组,让环信的先获取再自己服务器获取
-					createAppGroup(emGroup);
+					createAppGroup(emGroup,members);
 
 				} catch (final HyphenateException e) {
 					runOnUiThread(new Runnable() {
@@ -290,7 +290,7 @@ public class NewGroupActivity extends BaseActivity {
 		}).start();
 	}
 
-	private void createAppGroup(EMGroup emGroup) {
+	private void createAppGroup(final EMGroup emGroup, final String[] members) {
 		if(emGroup!=null){
 			mModel.newGroup(NewGroupActivity.this, emGroup.getGroupId(), emGroup.getGroupName(),
 					emGroup.getDescription(), emGroup.getOwner(), emGroup.isPublic(), emGroup.isAllowInvites(),
@@ -301,14 +301,20 @@ public class NewGroupActivity extends BaseActivity {
 							boolean isSuccess=false;
 							if(s!=null){
 								Result result = ResultUtils.getResultFromJson(s, Group.class);
-								if(result!=null&&result.isRetMsg()){
+									if(result!=null&&result.isRetMsg()){
 									Group group = (Group) result.getRetData();
 									if(group!=null){
-										isSuccess=true;
+										if(members.length>0){
+											addMembers(emGroup.getGroupId(),members);
+										}else {
+											isSuccess = true;
+										}
 									}
 								}
 							}
-							createSuccess(isSuccess);
+							if(members.length<=0) {
+								createSuccess(isSuccess);
+							}
 						}
 
 						@Override
@@ -318,7 +324,35 @@ public class NewGroupActivity extends BaseActivity {
 					});
 		}
 	}
+	private void addMembers(String hxid,String[] members){
+		mModel.addMembers(NewGroupActivity.this, getMember(members), hxid,
+				new OnCompleteListener<String>() {
+					@Override
+					public void onSuccess(String s) {
+						boolean success=false;
+						if(s!=null){
+							Result result = ResultUtils.getResultFromJson(s, Group.class);
+							if(result!=null&&result.isRetMsg()){
+									success=true;
+							}
+						}
+						createSuccess(success);
+					}
 
+					@Override
+					public void onError(String error) {
+						createSuccess(false);
+					}
+				});
+	}
+	//// FIXME: 2017/4/11 返回值写成默认的空,所以报空指针
+	private String getMember(String[] members){
+		String s="";
+		for(String str:members){
+			s+=str+",";
+		}
+		return s;
+	}
 	private void createSuccess(final boolean success) {
 		runOnUiThread(new Runnable() {
 			public void run() {
